@@ -16,10 +16,25 @@
 
             var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons 
                                                     && t.State == State.Free);
+
             Thread.Sleep(1000*5);
+            table?.SetState(State.Booked);
+
             Console.WriteLine(table is null
                 ? "К сожалению, сейчас все столики заняты"
                 : $"Готово! Ваш столик номер {table.Id}");
+        }
+
+        public void CancelReservation(int id)
+        {
+            var table = _tables.FirstOrDefault(t => t.Id == id
+                                                && t.State == State.Booked);
+            Thread.Sleep(1000 * 5);
+            table?.SetState(State.Free);
+
+            Console.WriteLine(table is null
+                ? "К сожалению, такого столика нет! Вы ошиблись с номером или он не был забронирован!"
+                : $"Готово! Бронь снята со стола под номером {table.Id}");
         }
 
         public async Task BookFreeTableAsync(int countOfPersons, CancellationToken token = default)
@@ -34,9 +49,26 @@
                 table?.SetState(State.Booked);
 
                 Console.WriteLine(table is null
-                    ? $"УВЕДОМЛЕНИЕ. К сожалению, сейчас все столики заняты"
+                    ? "УВЕДОМЛЕНИЕ. К сожалению, сейчас все столики заняты"
                     : $"УВЕДОМЛЕНИЕ. Готово! Ваш столик номер {table.Id}");
-            }, token).ConfigureAwait(true);
+            }, token)
+                .ConfigureAwait(true);
+        }
+
+        public async Task CancelReservationAsync(int id, CancellationToken token = default)
+        {
+            await Task.Run(async () =>
+            {
+                var table = _tables.FirstOrDefault(t => t.Id == id 
+                                                        && t.State == State.Booked);
+                await Task.Delay(1000 * 5, token);
+                table?.SetState(State.Free);
+
+                Console.WriteLine(table is null
+                    ? "К сожалению, такого столика нет! Вы ошиблись с номером или он не был забронирован!"
+                    : $"Готово! Бронь снята со стола под номером {table.Id}");
+            }, token)
+                .ConfigureAwait(true);
         }
     }
 }
