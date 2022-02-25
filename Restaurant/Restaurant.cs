@@ -57,11 +57,13 @@
                     await _notification.NotifyAsync("[1]", 0, token);
                 else
                     await _notification.NotifyAsync("[2]", table.Id, token);
-                
+
+                new Timer(async _ => await CancelReservationAsync(1, token), null, 20000, 0);
+
             }, token);
         }
 
-        public async Task CancelReservationAsync(int id, CancellationToken token = default)
+        public async Task CancelReservationAsync(int id = default, CancellationToken token = default)
         {
             Console.WriteLine("Добрый день! Вам придет уведомление");
 
@@ -77,6 +79,7 @@
                 else
                     await _notification.NotifyAsync("[4]", table.Id, token);
 
+                
             }, token);
         }
     }
