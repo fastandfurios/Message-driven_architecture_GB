@@ -1,10 +1,13 @@
 ﻿#region references
 using System.Diagnostics;
 using System.Text;
+using Restaurant;
 #endregion
 
 Console.OutputEncoding = Encoding.UTF8;
-var rest = new Restaurant.Restaurant();
+var notification = new Notification();
+await notification.ReadNotificationAsync().ConfigureAwait(true);
+var rest = new Restaurant.Restaurant(notification);
 while (true)
 {
     var stringBuilder = new StringBuilder();
@@ -15,7 +18,7 @@ while (true)
 
     if (!int.TryParse(Console.ReadLine(), out var variant) || variant is not (1 or 2))
     {
-        Console.WriteLine("Введите, пожалуйста 1 или 2");
+        await notification.NotifyAsync("[WARNING]");
         continue;
     }
 
@@ -24,7 +27,7 @@ while (true)
 
     if (!int.TryParse(Console.ReadLine(), out var choice) || choice is not (1 or 2))
     {
-        Console.WriteLine("Введите, пожалуйста 1 или 2");
+        await notification.NotifyAsync("[WARNING]");
         continue;
     }
 
@@ -36,13 +39,13 @@ while (true)
     switch (request)
     {
         case (1, 1):
-            await rest.BookFreeTableAsync(1).ConfigureAwait(true);
+            await rest.BookFreeTableAsync(1);
             break;
         case (1, 2):
             rest.BookFreeTable(1);
             break;
         case (2, 1):
-            await rest.CancelReservationAsync(1).ConfigureAwait(true);
+            await rest.CancelReservationAsync(1);
             break;
         case (2, 2):
             rest.CancelReservation(1);
