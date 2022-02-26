@@ -1,4 +1,6 @@
-﻿namespace Restaurant
+﻿using System.Text.RegularExpressions;
+
+namespace Restaurant
 {
     public class Notification
     {
@@ -17,19 +19,28 @@
             }
         }
 
-        public async Task NotifyAsync(string key, int id = default, CancellationToken token = default)
+        public void NotifyAsync(NKeys nKey, string subEntry = "", int id = default, bool isAwait = true, CancellationToken token = default)
         {
-            await Task.Run(async () =>
+            Task.Run(async () =>
+            {
+                if(isAwait)
+                    await Task.Delay(1000 * 2, token).ConfigureAwait(true);
+
+                var entry = _cache.FirstOrDefault(n => n.Contains(nKey.ToString()))!
+                    .Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
+
+                Console.ForegroundColor = nKey switch
                 {
-                    var entry = _cache.FirstOrDefault(n => n.Contains(key))!
-                        .Split(":", StringSplitOptions.RemoveEmptyEntries)[1];
-
-                    await Task.Delay(1000, token).ConfigureAwait(true);
-
-                    Console.ForegroundColor = key is "[WARNING]" ? ConsoleColor.DarkYellow : ConsoleColor.DarkGreen;
-                    Console.WriteLine(id == 0 ? entry : $"{entry} {id}");
-                    Console.ResetColor();
-                }, token);
+                    NKeys.NOT_1 => ConsoleColor.DarkGreen,
+                    NKeys.NOT_2 => ConsoleColor.DarkGreen,
+                    NKeys.NOT_3 => ConsoleColor.DarkGreen,
+                    NKeys.NOT_4 => ConsoleColor.DarkGreen,
+                    NKeys.WARNING => ConsoleColor.DarkYellow,
+                    _ => ConsoleColor.White
+                };
+                Console.WriteLine(id == 0 ? $"{subEntry}{entry.Replace("\\n", "\n")}" : $"{subEntry}{entry} {id}");
+                Console.ResetColor();
+            }, token);
         }
     }
 }

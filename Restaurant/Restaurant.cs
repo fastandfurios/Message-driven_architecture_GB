@@ -4,6 +4,7 @@
     {
         private readonly List<Table> _tables = new();
         private readonly Notification _notification;
+        private readonly object _lock = new();
 
         public Restaurant(Notification notification)
         {
@@ -11,11 +12,28 @@
 
             for (ushort i = 1; i <= 10; i++)
                 _tables.Add(new(i));
+
+            new Timer(async _ => await CancelAutomaticallyAsync(), null, 20_000, 20_000);
+        }
+
+        private async Task CancelAutomaticallyAsync(CancellationToken token = default)
+        {
+            await Task.Run(() =>
+            {
+                var table = _tables.FirstOrDefault(t => t.State == State.Booked);
+
+                if (table is not null)
+                {
+                    table.SetState(State.Free);
+                    _notification.NotifyAsync(NKeys.NOT_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
+                }
+                    
+            }, token);
         }
 
         public void BookFreeTable(int countOfPersons)
         {
-            Console.WriteLine("Добрый день! Подождите секунду я подберу столик и подтвержу вашу бронь, оставайтесь на линии");
+            _notification.NotifyAsync(NKeys.NOT_WEL, isAwait: false);
 
             var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons 
                                                     && t.State == State.Free);
@@ -23,63 +41,69 @@
             Thread.Sleep(1000*5);
             table?.SetState(State.Booked);
 
-            Console.WriteLine(table is null
-                ? "К сожалению, сейчас все столики заняты"
-                : $"Готово! Ваш столик номер {table.Id}");
+            if (table is null)
+                _notification.NotifyAsync(NKeys.NOT_1);
+            else
+                _notification.NotifyAsync(NKeys.NOT_2, id: table.Id);
         }
 
         public void CancelReservation(int id)
         {
-            Console.WriteLine("Добрый день! Оставайтесь на линии");
+            _notification.NotifyAsync(NKeys.CANCEL_WEL, isAwait: false);
 
             var table = _tables.FirstOrDefault(t => t.Id == id
                                                 && t.State == State.Booked);
             Thread.Sleep(1000 * 5);
             table?.SetState(State.Free);
 
-            Console.WriteLine(table is null
-                ? "К сожалению, такого столика нет! Вы ошиблись с номером или он не был забронирован!"
-                : $"Готово! Бронь снята со стола под номером {table.Id}");
+            if (table is null)
+                _notification.NotifyAsync(NKeys.NOT_3);
+            else
+                _notification.NotifyAsync(NKeys.NOT_4, id: table.Id);
         }
 
-        public async Task BookFreeTableAsync(int countOfPersons, CancellationToken token = default)
+        public void BookFreeTableAsync(int countOfPersons, CancellationToken token = default)
         {
-            Console.WriteLine("Добрый день! Подождите секунду я подберу столик и подтвержу вашу бронь, Вам придет уведомление");
+            _notification.NotifyAsync(NKeys.NOT_WEL_ASYNC, isAwait: false, token: token);
 
-            await Task.Run(async () =>
+            Task.Run(async () =>
             {
-                var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons
-                                                        && t.State == State.Free);
+                Table? table;
+
+                lock (_lock)
+                {
+                    
+                    table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons
+                                                            && t.State == State.Free);
+                    table?.SetState(State.Booked);
+                }
+
                 await Task.Delay(1000 * 5, token).ConfigureAwait(true);
-                table?.SetState(State.Booked);
 
                 if (table is null)
-                    await _notification.NotifyAsync("[1]", 0, token);
+                    _notification.NotifyAsync(NKeys.NOT_1, "УВЕДОМЛЕНИЕ:", token: token);
                 else
-                    await _notification.NotifyAsync("[2]", table.Id, token);
-
-                new Timer(async _ => await CancelReservationAsync(1, token), null, 20000, 0);
-
+                    _notification.NotifyAsync(NKeys.NOT_2, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
             }, token);
         }
 
-        public async Task CancelReservationAsync(int id = default, CancellationToken token = default)
+        public void CancelReservationAsync(int id = default, CancellationToken token = default)
         {
-            Console.WriteLine("Добрый день! Вам придет уведомление");
+            _notification.NotifyAsync(NKeys.CANCEL_WEL_ASYNC, isAwait: false, token: token);
 
-            await Task.Run(async () =>
+            Task.Run(async () =>
             {
-                var table = _tables.FirstOrDefault(t => t.Id == id 
+                var table = _tables.FirstOrDefault(t => t.Id == id
                                                         && t.State == State.Booked);
+
                 await Task.Delay(1000 * 5, token).ConfigureAwait(true);
+
                 table?.SetState(State.Free);
 
                 if (table is null)
-                    await _notification.NotifyAsync("[3]", 0, token);
+                    _notification.NotifyAsync(NKeys.NOT_3, "УВЕДОМЛЕНИЕ:", token: token);
                 else
-                    await _notification.NotifyAsync("[4]", table.Id, token);
-
-                
+                    _notification.NotifyAsync(NKeys.NOT_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
             }, token);
         }
     }
