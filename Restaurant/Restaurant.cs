@@ -1,4 +1,4 @@
-﻿namespace Restaurant
+﻿namespace RestaurantProject
 {
     public class Restaurant
     {
@@ -25,7 +25,7 @@
                 if (table is not null)
                 {
                     table.SetState(State.Free);
-                    _notification.NotifyAsync(NKeys.NOT_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
+                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
                 }
                     
             }, token);
@@ -33,23 +33,23 @@
 
         public void BookFreeTable(int countOfPersons)
         {
-            _notification.NotifyAsync(NKeys.NOT_WEL, isAwait: false);
+            _notification.NotifyAsync(NotificationsKeys.NotificationBookingLine, isAwait: false);
 
             var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons 
                                                     && t.State == State.Free);
 
-            Thread.Sleep(1000*5);
+            Thread.Sleep(1000 * 5);
             table?.SetState(State.Booked);
 
             if (table is null)
-                _notification.NotifyAsync(NKeys.NOT_1);
+                _notification.NotifyAsync(NotificationsKeys.NotificationMessage_1);
             else
-                _notification.NotifyAsync(NKeys.NOT_2, id: table.Id);
+                _notification.NotifyAsync(NotificationsKeys.NotificationMessage_2, id: table.Id);
         }
 
         public void CancelReservation(int id)
         {
-            _notification.NotifyAsync(NKeys.CANCEL_WEL, isAwait: false);
+            _notification.NotifyAsync(NotificationsKeys.NotificationCancelBookingLine, isAwait: false);
 
             var table = _tables.FirstOrDefault(t => t.Id == id
                                                 && t.State == State.Booked);
@@ -57,14 +57,14 @@
             table?.SetState(State.Free);
 
             if (table is null)
-                _notification.NotifyAsync(NKeys.NOT_3);
+                _notification.NotifyAsync(NotificationsKeys.NotificationMessage_3);
             else
-                _notification.NotifyAsync(NKeys.NOT_4, id: table.Id);
+                _notification.NotifyAsync(NotificationsKeys.NotificationMessage_4, id: table.Id);
         }
 
         public void BookFreeTableAsync(int countOfPersons, CancellationToken token = default)
         {
-            _notification.NotifyAsync(NKeys.NOT_WEL_ASYNC, isAwait: false, token: token);
+            _notification.NotifyAsync(NotificationsKeys.NotificationBooking, isAwait: false, token: token);
 
             Task.Run(async () =>
             {
@@ -72,24 +72,23 @@
 
                 lock (_lock)
                 {
-                    
                     table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons
-                                                            && t.State == State.Free);
+                                                        && t.State == State.Free);
                     table?.SetState(State.Booked);
                 }
 
                 await Task.Delay(1000 * 5, token).ConfigureAwait(true);
 
                 if (table is null)
-                    _notification.NotifyAsync(NKeys.NOT_1, "УВЕДОМЛЕНИЕ:", token: token);
+                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_1, "УВЕДОМЛЕНИЕ:", token: token);
                 else
-                    _notification.NotifyAsync(NKeys.NOT_2, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
+                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_2, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
             }, token);
         }
 
         public void CancelReservationAsync(int id = default, CancellationToken token = default)
         {
-            _notification.NotifyAsync(NKeys.CANCEL_WEL_ASYNC, isAwait: false, token: token);
+            _notification.NotifyAsync(NotificationsKeys.NotificationCancelBooking, isAwait: false, token: token);
 
             Task.Run(async () =>
             {
@@ -101,9 +100,9 @@
                 table?.SetState(State.Free);
 
                 if (table is null)
-                    _notification.NotifyAsync(NKeys.NOT_3, "УВЕДОМЛЕНИЕ:", token: token);
+                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_3, "УВЕДОМЛЕНИЕ:", token: token);
                 else
-                    _notification.NotifyAsync(NKeys.NOT_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
+                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_4, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
             }, token);
         }
     }
