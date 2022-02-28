@@ -1,4 +1,4 @@
-﻿namespace Restaurant
+﻿namespace RestaurantProject
 {
     public enum State
     {
