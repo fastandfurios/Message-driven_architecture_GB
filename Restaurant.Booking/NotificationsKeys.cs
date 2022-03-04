@@ -1,4 +1,4 @@
-﻿namespace Restaurant.Booking
+﻿namespace RestaurantProject.Booking
 {
     /// <summary> Перечисление ключевых фраз уведомлений </summary>
     [Flags]

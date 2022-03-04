@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging", "Messaging\Mess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Restaurant.Notification", "Restaurant.Notification\Restaurant.Notification.csproj", "{A737C361-DA31-4E42-AE76-30BD948F9129}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurant.Booking", "Restaurant.Booking\Restaurant.Booking.csproj", "{AC7D24C7-129F-4672-BB0B-12B409BFF505}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestaurantProject.Booking", "Restaurant.Booking\RestaurantProject.Booking.csproj", "{AC7D24C7-129F-4672-BB0B-12B409BFF505}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

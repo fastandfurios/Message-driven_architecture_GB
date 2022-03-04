@@ -1,4 +1,4 @@
-﻿namespace Restaurant.Booking
+﻿namespace RestaurantProject.Booking
 {
     public enum State
     {

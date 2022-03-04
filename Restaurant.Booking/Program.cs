@@ -1,13 +1,13 @@
 ﻿#region references
 using System.Diagnostics;
 using System.Text;
-using Restaurant.Booking;
+using RestaurantProject.Booking;
 #endregion
 
 Console.OutputEncoding = Encoding.UTF8;
 var notification = new Notification();
 await notification.ReadNotificationAsync().ConfigureAwait(true);
-var rest = new Restaurant.Booking.Restaurant(notification);
+var rest = new Restaurant(notification);
 
 while (true)
 {
