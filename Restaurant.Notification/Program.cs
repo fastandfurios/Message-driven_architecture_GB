@@ -3,7 +3,6 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Notification;
-
 #endregion
 
 Console.OutputEncoding = Encoding.UTF8;
