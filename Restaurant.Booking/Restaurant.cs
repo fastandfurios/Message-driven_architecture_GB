@@ -1,10 +1,13 @@
-﻿namespace RestaurantProject.Booking
+﻿using Messaging;
+
+namespace RestaurantProject.Booking
 {
     public class Restaurant
     {
         private readonly List<Table> _tables = new();
         private readonly Notification _notification;
         private readonly object _lock = new();
+        private readonly Producer _producer = new("localhost", "BookingNotification");
 
         public Restaurant(Notification notification)
         {
@@ -79,10 +82,14 @@
 
                 await Task.Delay(1000 * 5, token).ConfigureAwait(true);
 
-                if (table is null)
-                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_1, "УВЕДОМЛЕНИЕ:", token: token);
-                else
-                    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_2, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
+                _producer.Send(table is null
+                ? "УВЕДОМЛЕНИЕ: К сожалению, сейчас все столики заняты"
+                : $"УВЕДОМЛЕНИЕ: Готово! Ваш столик номер {table.Id}");
+
+                //if (table is null)
+                //    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_1, "УВЕДОМЛЕНИЕ:", token: token);
+                //else
+                //    _notification.NotifyAsync(NotificationsKeys.NotificationMessage_2, "УВЕДОМЛЕНИЕ:", table.Id, token: token);
             }, token);
         }
 
