@@ -24,7 +24,7 @@ namespace Messaging
             _channel.ExchangeDeclare(exchange: "direct_exchange", type: "direct");
 
             _channel.QueueDeclare(queue: _queueName,
-                durable: false,
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
