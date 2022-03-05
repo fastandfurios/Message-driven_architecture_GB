@@ -1,29 +1,28 @@
 ﻿#region references
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Channels;
 using RestaurantProject.Booking;
 #endregion
 
 Console.OutputEncoding = Encoding.UTF8;
-var notification = new Notification();
-await notification.ReadNotificationAsync().ConfigureAwait(true);
-var rest = new Restaurant(notification);
+var rest = new Restaurant();
 
 while (true)
 {
-    notification.NotifyAsync(NotificationsKeys.Introduction_1, isAwait: false);
+    Console.WriteLine("Привет!\n1 - Желаете забронировать столик?\n2 - Или отменить бронирование?");
 
     if (!int.TryParse(Console.ReadLine(), out var variant) || variant is not (1 or 2))
     {
-        notification.NotifyAsync(NotificationsKeys.NotificationWarning, isAwait: false);
+        Console.WriteLine("Введите, пожалуйста 1 или 2");
         continue;
     }
 
-    notification.NotifyAsync(NotificationsKeys.Introduction_2, isAwait: false);
+    Console.WriteLine("1 - мы уведомим Вас по смс (асинхронно)\n2 - подождите на линии, мы Вас оповестим (синхронно)");
 
     if (!int.TryParse(Console.ReadLine(), out var choice) || choice is not (1 or 2))
     {
-        notification.NotifyAsync(NotificationsKeys.NotificationWarning, isAwait: false);
+        Console.WriteLine("Введите, пожалуйста 1 или 2");
         continue;
     }
 
@@ -48,7 +47,7 @@ while (true)
             break;
     }
 
-    notification.NotifyAsync(NotificationsKeys.NotificationGoodbye, isAwait: false);
+    Console.WriteLine("Спасибо за Ваше обращение!");
     stopWatch.Stop();
     var ts = stopWatch.Elapsed;
     Console.WriteLine($"{ts.Seconds:00}:{ts.Milliseconds:00}");
