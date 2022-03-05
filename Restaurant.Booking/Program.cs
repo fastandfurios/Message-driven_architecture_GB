@@ -35,10 +35,10 @@ while (true)
     switch (request)
     {
         case ((int)Choice.first, (int)Choice.first):
-            rest.BookFreeTableAsync(5);
+            rest.BookFreeTableAsync(1);
             break;
         case ((int)Choice.first, (int)Choice.second):
-            rest.BookFreeTable(5);
+            rest.BookFreeTable(1);
             break;
         case ((int)Choice.second, (int)Choice.first):
             rest.CancelReservationAsync(1);
