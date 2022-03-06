@@ -1,4 +1,6 @@
 ﻿using Messaging;
+using Messaging.Interfaces;
+using Messaging.Producers;
 
 namespace RestaurantProject.Booking
 {
@@ -6,8 +8,7 @@ namespace RestaurantProject.Booking
     {
         private readonly List<Table> _tables = new();
         private readonly object _lock = new();
-        //private readonly Producer _producer = new("localhost", "BookingNotification");
-        private readonly Producer _producer = new("localhost");
+        private readonly IProducer _producer = new ProducerFanout("localhost");
 
         public Restaurant()
         {

@@ -1,17 +1,17 @@
 ﻿using System.Text;
-using Messaging;
+using Messaging.Consumers;
+using Messaging.Interfaces;
 using Microsoft.Extensions.Hosting;
 
 namespace Restaurant.Notification
 {
     public class Worker : BackgroundService
     {
-        private readonly Consumer _consumer;
+        private readonly IConsumer _consumer;
 
         public Worker()
         {
-            //_consumer = new Consumer("BookingNotification", "localhost");
-            _consumer = new Consumer("localhost");
+            _consumer = new ConsumerFanout("localhost");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
