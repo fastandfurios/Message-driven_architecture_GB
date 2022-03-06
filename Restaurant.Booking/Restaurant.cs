@@ -6,7 +6,8 @@ namespace RestaurantProject.Booking
     {
         private readonly List<Table> _tables = new();
         private readonly object _lock = new();
-        private readonly Producer _producer = new("localhost", "BookingNotification");
+        //private readonly Producer _producer = new("localhost", "BookingNotification");
+        private readonly Producer _producer = new("localhost");
 
         public Restaurant()
         {
@@ -25,7 +26,7 @@ namespace RestaurantProject.Booking
                 if (table is not null)
                 {
                     table.SetState(State.Free);
-                    Console.WriteLine($"Готово! Бронь снята со стола под номером {table.Id}");
+                    _producer.Send($"Готово! Бронь снята со стола под номером {table.Id}");
                 }
 
             }, token);
@@ -55,9 +56,9 @@ namespace RestaurantProject.Booking
             Thread.Sleep(1000 * 5);
             table?.SetState(State.Free);
 
-            Console.WriteLine(table is null 
-            ? "К сожалению, такого столика нет! Вы ошиблись с номером или он не был забронирован!"
-            : $"Готово! Бронь снята со стола под номером {table.Id}");
+            _producer.Send(table is null
+                ? "К сожалению, такого столика нет! Вы ошиблись с номером или он не был забронирован!"
+                : $"Готово! Бронь снята со стола под номером {table.Id}");
         }
 
         public void BookFreeTableAsync(int countOfPersons, CancellationToken token = default)

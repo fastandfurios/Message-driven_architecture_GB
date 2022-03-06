@@ -10,7 +10,8 @@ namespace Restaurant.Notification
 
         public Worker()
         {
-            _consumer = new Consumer("BookingNotification", "localhost");
+            //_consumer = new Consumer("BookingNotification", "localhost");
+            _consumer = new Consumer("localhost");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
