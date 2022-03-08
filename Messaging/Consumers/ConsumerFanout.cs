@@ -8,13 +8,12 @@ namespace Messaging.Consumers
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
-
-        public string HostName { get; set; }
+        private readonly string _hostName;
 
         public ConsumerFanout(string hostName)
         {
-            HostName = hostName;
-            var factory = new ConnectionFactory { HostName = HostName };
+            _hostName = hostName;
+            var factory = new ConnectionFactory { HostName = _hostName };
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
         }

@@ -7,18 +7,17 @@ namespace Messaging.Producers
     public class ProducerDirect : IProducer
     {
         private readonly string _queueName;
-
-        public string HostName { get; set; }
+        private readonly string _hostName;
 
         public ProducerDirect(string hostName, string queueName)
         {
-            HostName = hostName;
+            _hostName = hostName;
             _queueName = queueName;
         }
 
         public void Send(string message)
         {
-            var factory = new ConnectionFactory { HostName = HostName };
+            var factory = new ConnectionFactory { HostName = _hostName };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 

@@ -33,16 +33,16 @@ while (true)
 
     switch (request)
     {
-        case ((int)Choice.first, (int)Choice.first):
+        case ((int)Choice.FirstChoice, (int)Choice.FirstChoice):
             rest.BookFreeTableAsync(1);
             break;
-        case ((int)Choice.first, (int)Choice.second):
+        case ((int)Choice.FirstChoice, (int)Choice.SecondChoice):
             rest.BookFreeTable(1);
             break;
-        case ((int)Choice.second, (int)Choice.first):
+        case ((int)Choice.SecondChoice, (int)Choice.FirstChoice):
             rest.CancelReservationAsync(1);
             break;
-        case ((int)Choice.second, (int)Choice.second):
+        case ((int)Choice.SecondChoice, (int)Choice.SecondChoice):
             rest.CancelReservation(1);
             break;
     }
@@ -55,6 +55,8 @@ while (true)
 
 internal enum Choice
 {
-    first = 1,
-    second = 2
+    /// <summary> 1 вариант выбора </summary>
+    FirstChoice = 1,
+    /// <summary> 2 вариант выбора </summary>
+    SecondChoice = 2
 }

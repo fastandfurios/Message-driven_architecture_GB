@@ -6,16 +6,16 @@ namespace Messaging.Producers
 {
     public class ProducerFanout : IProducer
     {
+        private readonly string _hostName;
+
         public ProducerFanout(string hostName)
         {
-            HostName = hostName;
+            _hostName = hostName;
         }
-
-        public string HostName { get; set; }
 
         public void Send(string message)
         {
-            var factory = new ConnectionFactory { HostName = HostName };
+            var factory = new ConnectionFactory { HostName = _hostName };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
