@@ -1,30 +1,31 @@
 ﻿using System.Text;
-using Messaging.Consumers;
-using Messaging.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Hosting;
+using Restaurant.Messaging;
 
 namespace Restaurant.Notification
 {
     public class Worker : BackgroundService
     {
-        private readonly IConsumer _consumer;
+        private readonly IBus _bus;
+        private readonly Booking.Restaurant _restaurant;
 
-        public Worker()
+        public Worker(IBus bus, Booking.Restaurant restaurant)
         {
-            _consumer = new ConsumerFanout("localhost");
+            _bus = bus;
+            _restaurant = restaurant;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Task.Run(() =>
-            {
-                _consumer.Receive((sender, args) =>
-                {
-                    var body = args.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    Console.WriteLine("[x] Received {0}", message);
-                });
-            }, stoppingToken).ConfigureAwait(true);
+           Console.OutputEncoding = Encoding.UTF8;
+           while (!stoppingToken.IsCancellationRequested)
+           {
+               await Task.Delay(10000, stoppingToken);
+               Console.WriteLine("Привет! Желаете забронировать столик?");
+               var result = await _restaurant.BookFreeTableAsync(1, stoppingToken);
+               await _bus.Publish(new TableBooked(NewId.NextGuid(), result ?? false, NewId.NextGuid()), stoppingToken);
+           }
         }
     }
 }

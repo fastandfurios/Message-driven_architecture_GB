@@ -1,4 +1,4 @@
-﻿namespace RestaurantProject.Booking
+﻿namespace Restaurant.Booking
 {
     public class Table
     {
