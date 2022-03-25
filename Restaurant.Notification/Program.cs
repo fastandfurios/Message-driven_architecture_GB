@@ -4,6 +4,8 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Notification;
+using Restaurant.Notification.Consumers;
+
 #endregion
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -16,6 +18,9 @@ static IHostBuilder CreateHostBuilder(string[] args)
         {
             services.AddMassTransit(cofig =>
             {
+                cofig.AddConsumer<NotifierTableBookedConsumer>();
+                cofig.AddConsumer<KitchenReadyConsumer>();
+
                 cofig.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.UseMessageRetry(c =>
