@@ -27,7 +27,7 @@
 
             await Task.Delay(1000 * 5, token).ConfigureAwait(true);
 
-            return table is null;
+            return !(table is null);
         }
     }
 }
