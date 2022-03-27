@@ -33,7 +33,5 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             services.AddTransient<Restaurant.Booking.Restaurant>();
 
             services.AddHostedService<Worker>();
-
-            services.AddSingleton<Manager>();
         });
 #endregion
