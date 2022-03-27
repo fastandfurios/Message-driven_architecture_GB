@@ -29,5 +29,19 @@
 
             return !(table is null);
         }
+
+        public void CancelReservationAsync(int id = default, CancellationToken token = default)
+        {
+            Task.Run(async () =>
+            {
+                var table = _tables.FirstOrDefault(t => t.Id == id
+                                                        && t.State == State.Booked);
+
+                await Task.Delay(1000 * 5, token).ConfigureAwait(true);
+
+                table?.SetState(State.Free);
+
+            }, token);
+        }
     }
 }

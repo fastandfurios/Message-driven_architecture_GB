@@ -20,7 +20,7 @@ namespace Restaurant.Notification.Consumers
                 result ? Accepted.Booking : Accepted.Rejected,
                 context.Message.ClientId);
 
-            return Task.CompletedTask;
+            return context.ConsumeCompleted;
         }
     }
 }

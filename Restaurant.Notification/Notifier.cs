@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Restaurant.Messaging;
 
 namespace Restaurant.Notification
 {
@@ -8,7 +9,7 @@ namespace Restaurant.Notification
         Rejected = 0,
         Kitchen = 1,
         Booking = 2,
-        All = Kitchen | Booking
+        All = Kitchen | Booking,
     }
 
     public class Notifier
@@ -18,7 +19,8 @@ namespace Restaurant.Notification
         public void Accept(Guid orderId, Accepted accepted, Guid? clientId = null)
         {
             _state.AddOrUpdate(orderId, (clientId, accepted),
-                (guid, oldValue) => (oldValue.Item1 ?? clientId, oldValue.Item2 | accepted));
+                (guid, oldValue) => 
+                    (oldValue.Item1 ?? clientId, oldValue.Item2 | accepted));
 
             Notify(orderId);
         }
@@ -43,6 +45,11 @@ namespace Restaurant.Notification
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public void Notify(Guid orderId, Dish? dish)
+        {
+            Console.WriteLine($"Отмена бронирования стола по заказу {orderId} в связи с отсутсвием блюда {dish.Name}!");
         }
     }
 }

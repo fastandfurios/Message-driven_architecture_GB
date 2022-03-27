@@ -4,13 +4,13 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Booking;
+using Restaurant.Booking.Consumers;
 #endregion
 
 #region main
 Console.OutputEncoding = Encoding.UTF8;
 CreateHostBuilder(args).Build().Run();
 #endregion
-
 
 #region methods
 static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -19,6 +19,8 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         {
             services.AddMassTransit(configure =>
             {
+                configure.AddConsumer<KitchenAccidentConsumer>();
+
                 configure.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.ConfigureEndpoints(context);
@@ -31,5 +33,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             services.AddTransient<Restaurant.Booking.Restaurant>();
 
             services.AddHostedService<Worker>();
+
+            services.AddSingleton<Manager>();
         });
 #endregion

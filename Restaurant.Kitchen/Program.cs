@@ -30,5 +30,4 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
             services.AddSingleton<Manager>();
         });
-
 #endregion

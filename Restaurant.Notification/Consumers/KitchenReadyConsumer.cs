@@ -15,8 +15,8 @@ namespace Restaurant.Notification.Consumers
         public Task Consume(ConsumeContext<IKitchenReady> context)
         {
             _notifier.Accept(context.Message.OrderId, Accepted.Kitchen);
-
-            return Task.CompletedTask;
+            
+            return context.ConsumeCompleted;
         }
     }
 }

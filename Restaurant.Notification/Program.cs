@@ -5,11 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Notification;
 using Restaurant.Notification.Consumers;
-
 #endregion
 
+#region main
 Console.OutputEncoding = Encoding.UTF8;
 CreateHostBuilder(args).Build().Run();
+#endregion
 
 #region methods
 static IHostBuilder CreateHostBuilder(string[] args)
@@ -20,20 +21,10 @@ static IHostBuilder CreateHostBuilder(string[] args)
             {
                 cofig.AddConsumer<NotifierTableBookedConsumer>();
                 cofig.AddConsumer<KitchenReadyConsumer>();
+                cofig.AddConsumer<CancellationBookingConsumer>();
 
                 cofig.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.UseMessageRetry(c =>
-                    {
-                        c.Exponential(retryLimit: 5,
-                            minInterval: TimeSpan.FromSeconds(1),
-                            maxInterval: TimeSpan.FromSeconds(100),
-                            intervalDelta: TimeSpan.FromSeconds(5));
-
-                        c.Ignore<StackOverflowException>();
-                        c.Ignore<ArgumentNullException>(filter => filter.Message.Contains("Consumer"));
-                    });
-
                     cfg.ConfigureEndpoints(registration: context);
                 });
             });
