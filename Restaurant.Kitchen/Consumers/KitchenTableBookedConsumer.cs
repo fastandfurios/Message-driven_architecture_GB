@@ -18,14 +18,14 @@ namespace Restaurant.Kitchen.Consumers
 
             if (result)
             {
-                (bool confirmation, Dish? dish) conclusion = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
-                if (conclusion.confirmation)
+                var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
+                if (confirmation)
                 {
                     context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
                 }
                 else
                 {
-                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, conclusion.dish!));
+                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!));
                 }
             }
 
