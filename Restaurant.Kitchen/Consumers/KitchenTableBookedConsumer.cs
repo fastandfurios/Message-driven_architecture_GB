@@ -18,7 +18,7 @@ namespace Restaurant.Kitchen.Consumers
 
             if (result)
             {
-                _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
+                _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder, context);
             }
 
             return context.ConsumeCompleted;
