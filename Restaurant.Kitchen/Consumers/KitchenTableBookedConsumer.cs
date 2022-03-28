@@ -18,7 +18,15 @@ namespace Restaurant.Kitchen.Consumers
 
             if (result)
             {
-                _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder, context);
+                var conclusion = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
+                if (conclusion.Item1)
+                {
+                    context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
+                }
+                else
+                {
+                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, conclusion.Item2!));
+                }
             }
 
             return context.ConsumeCompleted;

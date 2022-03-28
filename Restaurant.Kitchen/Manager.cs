@@ -1,27 +1,23 @@
-﻿using MassTransit;
-using Restaurant.Messaging;
+﻿using Restaurant.Messaging;
 
 namespace Restaurant.Kitchen
 {
     public class Manager
     {
-        public void CheckKitchenReady(Guid orderId, Dish? dish, ConsumeContext context)
+        public (bool, Dish?) CheckKitchenReady(Guid orderId, Dish? dish)
         {
             switch (dish.Id)
             {
                 case (int)Dishes.Pizza:
                 case (int)Dishes.Burger:
                 case (int)Dishes.Rolls:
-                    context.Publish<IKitchenReady>(new KitchenReady(orderId, true));
-                    break;
+                    return (true, dish);
                 case (int)Dishes.Chicken:
-                    dish.Name = Dishes.Potato.ToString();
-                    context.Publish<IKitchenAccident>(new KitchenAccident(orderId, dish));
-                    break;
+                    dish.Name = Dishes.Chicken.ToString();
+                    return (false, dish);
                 case (int)Dishes.Potato:
                     dish.Name = Dishes.Potato.ToString();
-                    context.Publish<IKitchenAccident>(new KitchenAccident(orderId, dish));
-                    break;
+                    return (false, dish);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
