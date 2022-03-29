@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Restaurant.Booking\Restaurant.Booking.csproj" />
     <ProjectReference Include="..\Restaurant.Messaging\Restaurant.Messaging.csproj" />
   </ItemGroup>
 

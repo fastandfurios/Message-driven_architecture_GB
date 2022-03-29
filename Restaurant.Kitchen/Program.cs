@@ -3,8 +3,8 @@ using System.Text;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Restaurant.Booking;
-using Restaurant.Booking.Consumers;
+using Restaurant.Kitchen;
+using Restaurant.Kitchen.Consumers;
 #endregion
 
 #region main
@@ -13,13 +13,14 @@ CreateHostBuilder(args).Build().Run();
 #endregion
 
 #region methods
+
 static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
-        .ConfigureServices(services =>
+        .ConfigureServices((hostContext, services) =>
         {
             services.AddMassTransit(configure =>
             {
-                configure.AddConsumer<KitchenAccidentConsumer>();
+                configure.AddConsumer<KitchenTableBookedConsumer>();
 
                 configure.UsingRabbitMq((context, cfg) =>
                 {
@@ -27,11 +28,6 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 });
             });
 
-            //Обратите внимание, что для MassTransit V8 или более поздней версии этот пакет больше не требуется и на него не следует ссылаться.‎
-            //services.AddMassTransitHostedService(waitUntilStarted: true);
-
-            services.AddTransient<Restaurant.Booking.Restaurant>();
-
-            services.AddHostedService<Worker>();
+            services.AddSingleton<Manager>();
         });
 #endregion
