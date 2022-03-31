@@ -1,5 +1,6 @@
 ﻿using MassTransit;
-using Restaurant.Messaging;
+using Restaurant.Messages.Implementation;
+using Restaurant.Messages.Interfaces;
 
 namespace Restaurant.Booking.Consumers
 {
@@ -15,7 +16,7 @@ namespace Restaurant.Booking.Consumers
         public Task Consume(ConsumeContext<IKitchenAccident> context)
         {
             _restaurant.CancelReservationAsync();
-            context.Publish(new CancellationBooking(context.Message.OrderId, context.Message.Dish));
+            context.Publish<ICancellationBooking>(new CancellationBooking(context.Message.OrderId, context.Message.ClientId, ""));
 
             return context.ConsumeCompleted;
         }
