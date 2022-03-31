@@ -1,5 +1,7 @@
 ﻿using MassTransit;
-using Restaurant.Messaging;
+using Restaurant.Messages;
+using Restaurant.Messages.Implementation;
+using Restaurant.Messages.Interfaces;
 
 namespace Restaurant.Kitchen.Consumers
 {
@@ -25,7 +27,7 @@ namespace Restaurant.Kitchen.Consumers
                 }
                 else
                 {
-                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!));
+                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!, context.Message.ClientId, ""));
                 }
             }
 
