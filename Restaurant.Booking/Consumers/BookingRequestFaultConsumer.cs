@@ -1,0 +1,14 @@
+﻿using MassTransit;
+using Restaurant.Messages.Interfaces;
+
+namespace Restaurant.Booking.Consumers
+{
+    public class BookingRequestFaultConsumer : IConsumer<Fault<IBookingRequest>>
+    {
+        public Task Consume(ConsumeContext<Fault<IBookingRequest>> context)
+        {
+            Console.WriteLine($"[OrderId {context.Message.Message.OrderId}] Отмена в зале");
+            return context.ConsumeCompleted;
+        }
+    }
+}
