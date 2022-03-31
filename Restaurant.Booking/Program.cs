@@ -20,11 +20,17 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         {
             services.AddMassTransit(configure =>
             {
-                configure.AddConsumer<BookingRequestConsumer>();
+                configure.AddConsumer<BookingRequestConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
 
-                configure.AddConsumer<KitchenAccidentConsumer>();
+                configure.AddConsumer<KitchenAccidentConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
+
+                configure.AddConsumer<BookingRequestFaultConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
 
                 configure.AddSagaStateMachine<RestaurantBookingSaga, RestaurantBooking>()
+                    .Endpoint(cfg => cfg.Temporary = true)
                     .InMemoryRepository();
 
                 configure.AddDelayedMessageScheduler();
@@ -32,6 +38,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 configure.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.UseDelayedMessageScheduler();
+                    cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(context);
                 });
             });
