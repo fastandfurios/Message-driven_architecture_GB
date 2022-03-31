@@ -1,5 +1,6 @@
 ﻿using MassTransit;
-using Restaurant.Messaging;
+using Restaurant.Messages;
+using Restaurant.Messages.Interfaces;
 
 namespace Restaurant.Notification.Consumers
 {
@@ -14,7 +15,7 @@ namespace Restaurant.Notification.Consumers
 
         public Task Consume(ConsumeContext<ICancellationBooking> context)
         {
-            _notifier.Notify(context.Message.OrderId, context.Message.Dish);
+            _notifier.Notify(context.Message.OrderId, context.Message.ClientId, context.Message.Message);
 
             return context.ConsumeCompleted;
         }

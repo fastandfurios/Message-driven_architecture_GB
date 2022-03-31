@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using Restaurant.Messaging;
+using Restaurant.Messages;
 
 namespace Restaurant.Notification.Consumers
 {
@@ -14,8 +14,6 @@ namespace Restaurant.Notification.Consumers
 
         public Task Consume(ConsumeContext<IKitchenReady> context)
         {
-            _notifier.Accept(context.Message.OrderId, Accepted.Kitchen);
-            
             return context.ConsumeCompleted;
         }
     }
