@@ -20,7 +20,8 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         {
             services.AddMassTransit(configure =>
             {
-                configure.AddConsumer<KitchenTableBookedConsumer>();
+                configure.AddConsumer<KitchenTableBookedConsumer>()
+                    .Endpoint(config => config.Temporary = true);
 
                 configure.UsingRabbitMq((context, cfg) =>
                 {
