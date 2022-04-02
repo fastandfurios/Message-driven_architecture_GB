@@ -1,10 +1,8 @@
-﻿namespace Restaurant.Messages
+﻿namespace Restaurant.Messages.Interfaces
 {
     public interface ITableBooked
     {
-        public Guid OrderId { get; }
-        public Guid ClientId { get; }
-        public Dish? PreOrder { get; }
-        public bool Success { get; set; }
+        Guid OrderId { get; }
+        bool Success { get; }
     }
 }

@@ -2,9 +2,7 @@
 {
     public interface ICancellationBooking
     {
-        Guid ClientId { get; }
-        string Message { get; }
+        Dish Dish { get; }
         Guid OrderId { get; }
-        
     }
 }

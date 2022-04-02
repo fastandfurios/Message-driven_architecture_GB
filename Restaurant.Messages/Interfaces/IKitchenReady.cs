@@ -1,8 +1,8 @@
-﻿namespace Restaurant.Messages
+﻿namespace Restaurant.Messages.Interfaces
 {
     public interface IKitchenReady
     {
-        public Guid OrderId { get; }
-        public bool Ready { get; }
+        Guid OrderId { get; }
+        bool Ready { get; set; }
     }
 }

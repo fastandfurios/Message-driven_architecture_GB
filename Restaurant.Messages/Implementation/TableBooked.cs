@@ -1,18 +1,16 @@
-﻿namespace Restaurant.Messages.Implementation
+﻿using Restaurant.Messages.Interfaces;
+
+namespace Restaurant.Messages.Implementation
 {
     public class TableBooked : ITableBooked
     {
-        public Guid OrderId { get; }
-        public Guid ClientId { get; }
-        public Dish? PreOrder { get; }
-        public bool Success { get; set; }
-
-        public TableBooked(Guid clientId, bool success, Guid orderId, Dish? preOrder = null)
+        public TableBooked(Guid orderId, bool success)
         {
-            ClientId = clientId;
-            PreOrder = preOrder;
-            Success = success;
             OrderId = orderId;
+            Success = success;
         }
+        
+        public Guid OrderId { get; }
+        public bool Success { get; }
     }
 }
