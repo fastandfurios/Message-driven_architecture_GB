@@ -1,11 +1,10 @@
 ﻿using MassTransit;
-using Restaurant.Messages;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 
 namespace Restaurant.Kitchen.Consumers
 {
-    public class KitchenTableBookedConsumer : IConsumer<ITableBooked>
+    public class KitchenTableBookedConsumer : IConsumer<IBookingRequest>
     {
         private readonly Manager _manager;
 
@@ -14,24 +13,22 @@ namespace Restaurant.Kitchen.Consumers
             _manager = manager;
         }
 
-        public Task Consume(ConsumeContext<ITableBooked> context)
+        public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
-            var result = context.Message.Success;
+            var random = new Random().Next(100, 1000);
 
-            if (result)
+            Console.WriteLine($"[Заказ {context.Message.OrderId}] Проверка на кухне займет: {random}");
+            await Task.Delay(random);
+
+            var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
+            if (confirmation)
             {
-                var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
-                if (confirmation)
-                {
-                    context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
-                }
-                else
-                {
-                    context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!, context.Message.ClientId, ""));
-                }
+              await context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
             }
-
-            return context.ConsumeCompleted;
+            else
+            {
+               await context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!));
+            }
         }
     }
 }
