@@ -14,7 +14,7 @@
         public async Task<bool?> BookFreeTableAsync(int countOfPersons, CancellationToken token = default)
         {
             Console.WriteLine(
-                "Добрый день! Подождите секунду я подберу столик и подтвержу вашу бронь, Вам придет уведомление");
+                "Спасибо за Ваше обращение, я подберу столик и подтвержу вашу бронь, Вам придет уведомление");
 
             Table? table;
 
@@ -25,7 +25,7 @@
                 table?.SetState(State.Booked);
             }
 
-            await Task.Delay(1000 * 5, token).ConfigureAwait(true);
+            await Task.Delay(100, token).ConfigureAwait(true);
 
             return !(table is null);
         }

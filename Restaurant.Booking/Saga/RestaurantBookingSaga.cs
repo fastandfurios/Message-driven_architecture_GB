@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using Restaurant.Booking.Consumers;
-using Restaurant.Messages;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 
@@ -23,6 +22,9 @@ namespace Restaurant.Booking.Saga
             Event(() => KitchenReady,
                 cfg => cfg.CorrelateById(context => context.Message.OrderId));
 
+            Event(() => KitchenAccident,
+                cfg => cfg.CorrelateById(context => context.Message.OrderId));
+
             CompositeEvent(() => BookingApproved,
             tracking => tracking.ReadyEventStatus, KitchenReady, TableBooked);
 
@@ -43,33 +45,37 @@ namespace Restaurant.Booking.Saga
                         action.Saga.CorrelationId = action.Message.OrderId;
                         action.Saga.OrderId = action.Message.OrderId;
                         action.Saga.ClientId = action.Message.ClientId;
+                        Console.WriteLine($"Saga: {DateTime.Now:HH:mm:ss}");
                     })
-                    .Schedule(BookingExpired, 
-                        factory => new BookingExpire(factory.Saga),
-                        provider => TimeSpan.FromSeconds(100))
+                    //.Schedule(BookingExpired,
+                    //    factory => new BookingExpire(factory.Saga),
+                    //    provider => TimeSpan.FromSeconds(100))
                     .TransitionTo(AwaitingBookingApproved)
             );
 
             During(AwaitingBookingApproved,
                 When(BookingApproved)
-                    .Unschedule(BookingExpired)
-                    .Publish(factory => new Notify(factory.Saga.ClientId,
+                    //.Unschedule(BookingExpired)
+                    .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId, "Стол успешно забронирован"))
                     .Finalize(),
-                
+
                 When(BookingRequestFault)
                     .Then(action => Console.WriteLine("Что-то пошло не так!"))
-                    .Publish(factory => new Notify(factory.Saga.ClientId,
+                    .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId,
                         "Приносим извенения, стол забронировать не получилось."))
-                    .Publish(factory => new CancellationBooking(factory.Saga.OrderId,
-                        factory.Saga.ClientId,
-                        ""))
-                    .Finalize());
+                    .Finalize(),
 
-            When(BookingExpired!.Received)
-                .Then(action => Console.WriteLine($"Отмена заказа {action.Saga.OrderId}"))
-                .Finalize();
+                When(BookingExpired!.Received)
+                    .Then(action => Console.WriteLine($"Отмена заказа {action.Saga.OrderId}"))
+                    .Finalize(),
+
+                When(KitchenAccident)
+                    .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
+                        factory.Saga.OrderId,
+                        $"Отмена бронирования стола по заказу в связи с отсутсвием блюда!"))
+                    .Finalize());
 
             SetCompletedWhenFinalized();
         }
@@ -83,6 +89,7 @@ namespace Restaurant.Booking.Saga
         public Event<Fault<IBookingRequest>> BookingRequestFault { get; private set; }
         public Event<IKitchenReady> KitchenReady { get; private set; }
         public Event<ITableBooked> TableBooked { get; private set; }
+        public Event<IKitchenAccident> KitchenAccident { get; set; }
         #endregion
     }
 }

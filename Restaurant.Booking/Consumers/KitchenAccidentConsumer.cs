@@ -16,7 +16,7 @@ namespace Restaurant.Booking.Consumers
         public Task Consume(ConsumeContext<IKitchenAccident> context)
         {
             _restaurant.CancelReservationAsync();
-            context.Publish<ICancellationBooking>(new CancellationBooking(context.Message.OrderId, context.Message.ClientId, ""));
+            context.Publish(new KitchenAccident(context.Message.OrderId, context.Message.Dish));
 
             return context.ConsumeCompleted;
         }
