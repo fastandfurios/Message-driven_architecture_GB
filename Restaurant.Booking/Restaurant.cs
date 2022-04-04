@@ -27,7 +27,7 @@
 
             await Task.Delay(100, token).ConfigureAwait(true);
 
-            return !(table is null);
+            return table is not null;
         }
 
         public void CancelReservationAsync(int id = default, CancellationToken token = default)

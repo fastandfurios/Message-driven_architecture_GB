@@ -20,7 +20,7 @@ namespace Restaurant.Booking
             Console.OutputEncoding = Encoding.UTF8;
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(millisecondsDelay: 5000, stoppingToken);
+                await Task.Delay(millisecondsDelay: 10000, stoppingToken);
                 Console.WriteLine("Привет! Желаете забронировать столик?");
 
                 await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = Random.Shared.Next(1, 5) }), 

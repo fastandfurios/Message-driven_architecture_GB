@@ -15,11 +15,11 @@ namespace Restaurant.Kitchen.Consumers
 
         public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
-            var random = new Random().Next(100, 1000);
+            var random = new Random().Next(1000, 10000);
 
             Console.WriteLine($"[Заказ {context.Message.OrderId}] Проверка на кухне займет: {random}");
             await Task.Delay(random);
-
+            
             var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
             if (confirmation)
             {

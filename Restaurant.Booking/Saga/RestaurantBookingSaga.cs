@@ -3,6 +3,7 @@ using Restaurant.Booking.Consumers;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 
+#nullable disable
 namespace Restaurant.Booking.Saga
 {
     public class RestaurantBookingSaga : MassTransitStateMachine<RestaurantBooking>
@@ -10,6 +11,7 @@ namespace Restaurant.Booking.Saga
         #region constructor
         public RestaurantBookingSaga()
         {
+            #region config
             InstanceState(prop => prop.CurrentState);
 
             Event(() => BookingRequested,
@@ -37,7 +39,9 @@ namespace Restaurant.Booking.Saga
                     cfg.Delay = TimeSpan.FromSeconds(5);
                     cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
                 });
+            #endregion
 
+            #region build
             Initially(
                 When(BookingRequested)
                     .Then(action =>
@@ -45,17 +49,14 @@ namespace Restaurant.Booking.Saga
                         action.Saga.CorrelationId = action.Message.OrderId;
                         action.Saga.OrderId = action.Message.OrderId;
                         action.Saga.ClientId = action.Message.ClientId;
-                        Console.WriteLine($"Saga: {DateTime.Now:HH:mm:ss}");
                     })
-                    //.Schedule(BookingExpired,
-                    //    factory => new BookingExpire(factory.Saga),
-                    //    provider => TimeSpan.FromSeconds(100))
+                    .Schedule(BookingExpired, factory => new BookingExpire(factory.Saga))
                     .TransitionTo(AwaitingBookingApproved)
             );
 
             During(AwaitingBookingApproved,
                 When(BookingApproved)
-                    //.Unschedule(BookingExpired)
+                    .Unschedule(BookingExpired)
                     .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId, "Стол успешно забронирован"))
                     .Finalize(),
@@ -75,9 +76,15 @@ namespace Restaurant.Booking.Saga
                     .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId,
                         $"Отмена бронирования стола по заказу в связи с отсутсвием блюда!"))
-                    .Finalize());
+                    .Finalize(),
 
+                When(BookingApproved)
+                    .Then(action => Console.WriteLine($"Ожидание гостя {action.Saga.ClientId}"))
+                    .Finalize()
+            );
+                
             SetCompletedWhenFinalized();
+            #endregion
         }
         #endregion
 
@@ -89,7 +96,7 @@ namespace Restaurant.Booking.Saga
         public Event<Fault<IBookingRequest>> BookingRequestFault { get; private set; }
         public Event<IKitchenReady> KitchenReady { get; private set; }
         public Event<ITableBooked> TableBooked { get; private set; }
-        public Event<IKitchenAccident> KitchenAccident { get; set; }
+        public Event<IKitchenAccident> KitchenAccident { get; private set; }
         #endregion
     }
 }
