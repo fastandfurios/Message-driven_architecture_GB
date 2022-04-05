@@ -39,6 +39,12 @@ namespace Restaurant.Booking.Saga
                     cfg.Delay = TimeSpan.FromSeconds(5);
                     cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
                 });
+
+            Schedule(() => GuestWaitingTimeExpired,
+                token => token.WaitingId, cfg =>
+                {
+                    cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
+                });
             #endregion
 
             #region build
@@ -59,7 +65,11 @@ namespace Restaurant.Booking.Saga
                     .Unschedule(BookingExpired)
                     .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId, "Стол успешно забронирован"))
-                    .Finalize(),
+                    .Then(action => Console.WriteLine($"Ожидание гостя {action.Saga.ClientId}"))
+                    .Schedule(GuestWaitingTimeExpired, factory => new GuestWaitingTimeExpire(factory.Saga),
+                        delay => delay.Delay = TimeSpan.FromSeconds(Random.Shared.Next(7, 15)))
+                    .Finalize()
+                    .TransitionTo(GuestWaitingTimeState),
 
                 When(BookingRequestFault)
                     .Then(action => Console.WriteLine("Что-то пошло не так!"))
@@ -76,13 +86,15 @@ namespace Restaurant.Booking.Saga
                     .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId,
                         $"Отмена бронирования стола по заказу в связи с отсутсвием блюда!"))
-                    .Finalize(),
-
-                When(BookingApproved)
-                    .Then(action => Console.WriteLine($"Ожидание гостя {action.Saga.ClientId}"))
                     .Finalize()
             );
-                
+
+            During(GuestWaitingTimeState,
+            When(GuestWaitingTimeExpired!.Received)
+                    .Then(action => Console.WriteLine($"Гость {action.Saga.ClientId} прибыл"))
+                    .Finalize());
+
+
             SetCompletedWhenFinalized();
             #endregion
         }
@@ -90,6 +102,7 @@ namespace Restaurant.Booking.Saga
 
         #region properties
         public MassTransit.State AwaitingBookingApproved { get; private set; }
+        public MassTransit.State GuestWaitingTimeState { get; private set; }
         public Event BookingApproved { get; private set; }
         public Schedule<RestaurantBooking, IBookingExpire> BookingExpired { get; private set; }
         public Event<IBookingRequest> BookingRequested { get; private set; }
@@ -97,6 +110,7 @@ namespace Restaurant.Booking.Saga
         public Event<IKitchenReady> KitchenReady { get; private set; }
         public Event<ITableBooked> TableBooked { get; private set; }
         public Event<IKitchenAccident> KitchenAccident { get; private set; }
+        public Schedule<RestaurantBooking, IGuestWaitingTimeExpire> GuestWaitingTimeExpired { get; private set; }
         #endregion
     }
 }
