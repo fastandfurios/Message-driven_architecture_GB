@@ -45,6 +45,12 @@ namespace Restaurant.Booking.Saga
                 {
                     cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
                 });
+
+            Schedule(() => TimeArrivalGuestExpired,
+                token => token.ArrivalId, cfg =>
+                {
+                    cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
+                });
             #endregion
 
             #region build
@@ -68,7 +74,8 @@ namespace Restaurant.Booking.Saga
                     .Then(action => Console.WriteLine($"Ожидание гостя {action.Saga.ClientId}"))
                     .Schedule(GuestWaitingTimeExpired, factory => new GuestWaitingTimeExpire(factory.Saga),
                         delay => delay.Delay = TimeSpan.FromSeconds(Random.Shared.Next(7, 15)))
-                    .Finalize()
+                    .Schedule(TimeArrivalGuestExpired, factory => new TimeArrivalGuestExpire(factory.Saga),
+                        delay => delay.Delay = TimeSpan.FromSeconds(Random.Shared.Next(7, 15)))
                     .TransitionTo(GuestWaitingTimeState),
 
                 When(BookingRequestFault)
@@ -90,10 +97,16 @@ namespace Restaurant.Booking.Saga
             );
 
             During(GuestWaitingTimeState,
-            When(GuestWaitingTimeExpired!.Received)
+                When(GuestWaitingTimeExpired!.Received)
+                    .Unschedule(TimeArrivalGuestExpired)
                     .Then(action => Console.WriteLine($"Гость {action.Saga.ClientId} прибыл"))
-                    .Finalize());
+                    .Finalize(),
 
+                When(TimeArrivalGuestExpired!.Received)
+                    .Unschedule(GuestWaitingTimeExpired)
+                    .Then(action => Console.WriteLine($"Гость {action.Saga.ClientId} не пришел"))
+                    .Finalize()
+                );
 
             SetCompletedWhenFinalized();
             #endregion
@@ -111,6 +124,7 @@ namespace Restaurant.Booking.Saga
         public Event<ITableBooked> TableBooked { get; private set; }
         public Event<IKitchenAccident> KitchenAccident { get; private set; }
         public Schedule<RestaurantBooking, IGuestWaitingTimeExpire> GuestWaitingTimeExpired { get; private set; }
+        public Schedule<RestaurantBooking, ITimeArrivalGuestExpire> TimeArrivalGuestExpired { get; private set; }
         #endregion
     }
 }
