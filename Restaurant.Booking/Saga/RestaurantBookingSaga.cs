@@ -61,6 +61,7 @@ namespace Restaurant.Booking.Saga
                         action.Saga.CorrelationId = action.Message.OrderId;
                         action.Saga.OrderId = action.Message.OrderId;
                         action.Saga.ClientId = action.Message.ClientId;
+                        action.Saga.ArrivalTime = action.Message.ArrivalTime;
                     })
                     .Schedule(BookingExpired, factory => new BookingExpire(factory.Saga))
                     .TransitionTo(AwaitingBookingApproved)
@@ -75,7 +76,7 @@ namespace Restaurant.Booking.Saga
                     .Schedule(GuestWaitingTimeExpired, factory => new GuestWaitingTimeExpire(factory.Saga),
                         delay => delay.Delay = TimeSpan.FromSeconds(Random.Shared.Next(7, 15)))
                     .Schedule(TimeArrivalGuestExpired, factory => new TimeArrivalGuestExpire(factory.Saga),
-                        delay => delay.Delay = TimeSpan.FromSeconds(Random.Shared.Next(7, 15)))
+                        delay => delay.Saga.ArrivalTime)
                     .TransitionTo(GuestWaitingTimeState),
 
                 When(BookingRequestFault)

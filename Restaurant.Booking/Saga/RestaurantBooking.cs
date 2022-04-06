@@ -12,5 +12,6 @@ namespace Restaurant.Booking.Saga
         public Guid? ExpirationId { get; set; }
         public Guid? WaitingId { get; set; }
         public Guid? ArrivalId { get; set; }
+        public TimeSpan ArrivalTime { get; set; }
     }
 }

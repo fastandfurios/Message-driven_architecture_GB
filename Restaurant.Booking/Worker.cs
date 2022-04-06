@@ -23,7 +23,7 @@ namespace Restaurant.Booking
                 await Task.Delay(millisecondsDelay: 10000, stoppingToken);
                 Console.WriteLine("Привет! Желаете забронировать столик?");
 
-                await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = Random.Shared.Next(1, 5) }), 
+                await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = Random.Shared.Next(1, 5) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15))), 
                     stoppingToken);
             }
         }

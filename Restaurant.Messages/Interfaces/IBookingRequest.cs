@@ -5,5 +5,6 @@
         Guid ClientId { get; }
         Guid OrderId { get; }
         Dish? PreOrder { get; }
+        TimeSpan ArrivalTime { get; }
     }
 }
