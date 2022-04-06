@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Booking;
 using Restaurant.Booking.Consumers;
+using Restaurant.Booking.Saga;
 #endregion
 
 #region main
@@ -19,16 +20,32 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         {
             services.AddMassTransit(configure =>
             {
-                configure.AddConsumer<KitchenAccidentConsumer>();
+                configure.AddConsumer<BookingRequestConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
+
+                configure.AddConsumer<KitchenAccidentConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
+
+                configure.AddConsumer<BookingRequestFaultConsumer>()
+                    .Endpoint(cfg => cfg.Temporary = true);
+
+                configure.AddSagaStateMachine<RestaurantBookingSaga, RestaurantBooking>()
+                    .Endpoint(cfg => cfg.Temporary = true)
+                    .InMemoryRepository();
+
+                configure.AddDelayedMessageScheduler();
 
                 configure.UsingRabbitMq((context, cfg) =>
                 {
+                    cfg.UseDelayedMessageScheduler();
+                    cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(context);
                 });
             });
 
-            //Обратите внимание, что для MassTransit V8 или более поздней версии этот пакет больше не требуется и на него не следует ссылаться.‎
-            //services.AddMassTransitHostedService(waitUntilStarted: true);
+            services.AddTransient<RestaurantBooking>();
+
+            services.AddTransient<RestaurantBookingSaga>();
 
             services.AddTransient<Restaurant.Booking.Restaurant>();
 

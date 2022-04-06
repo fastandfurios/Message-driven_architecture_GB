@@ -1,4 +1,6 @@
-﻿namespace Restaurant.Messaging
+﻿using Restaurant.Messages.Interfaces;
+
+namespace Restaurant.Messages.Implementation
 {
     public class KitchenReady : IKitchenReady
     {
@@ -7,8 +9,8 @@
             OrderId = orderId;
             Ready = ready;
         }
-
+        
         public Guid OrderId { get; }
-        public bool Ready { get; }
+        public bool Ready { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Restaurant.Messaging
+﻿using Restaurant.Messages.Interfaces;
+
+namespace Restaurant.Messages.Implementation
 {
     public class KitchenAccident : IKitchenAccident
     {
@@ -7,7 +9,7 @@
             OrderId = orderId;
             Dish = dish;
         }
-
+        
         public Guid OrderId { get; }
         public Dish Dish { get; }
     }

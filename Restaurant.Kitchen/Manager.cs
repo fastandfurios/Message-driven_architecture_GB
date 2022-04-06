@@ -1,10 +1,10 @@
-﻿using Restaurant.Messaging;
+﻿using Restaurant.Messages;
 
 namespace Restaurant.Kitchen
 {
     public class Manager
     {
-        public (bool confirmation, Dish? dish) CheckKitchenReady(Guid orderId, Dish? dish)
+        public (bool confirmation, Dish dish) CheckKitchenReady(Guid orderId, Dish dish)
         {
             switch (dish.Id)
             {

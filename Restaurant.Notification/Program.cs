@@ -17,15 +17,14 @@ static IHostBuilder CreateHostBuilder(string[] args)
 => Host.CreateDefaultBuilder(args)
         .ConfigureServices((services) =>
         {
-            services.AddMassTransit(cofig =>
+            services.AddMassTransit(cfg =>
             {
-                cofig.AddConsumer<NotifierTableBookedConsumer>();
-                cofig.AddConsumer<KitchenReadyConsumer>();
-                cofig.AddConsumer<CancellationBookingConsumer>();
+                cfg.AddConsumer<NotifyConsumer>()
+                    .Endpoint(configure => configure.Temporary = true);
 
-                cofig.UsingRabbitMq((context, cfg) =>
+                cfg.UsingRabbitMq((context, config) =>
                 {
-                    cfg.ConfigureEndpoints(registration: context);
+                    config.ConfigureEndpoints(registration: context);
                 });
             });
 

@@ -1,19 +1,18 @@
 ﻿using System.Text;
 using MassTransit;
 using Microsoft.Extensions.Hosting;
-using Restaurant.Messaging;
+using Restaurant.Messages;
+using Restaurant.Messages.Implementation;
 
 namespace Restaurant.Booking
 {
     public class Worker : BackgroundService
     {
         private readonly IBus _bus;
-        private readonly Restaurant _restaurant;
 
-        public Worker(IBus bus, Restaurant restaurant)
+        public Worker(IBus bus)
         {
             _bus = bus;
-            _restaurant = restaurant;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,9 +22,9 @@ namespace Restaurant.Booking
             {
                 await Task.Delay(millisecondsDelay: 10000, stoppingToken);
                 Console.WriteLine("Привет! Желаете забронировать столик?");
-                var result = await _restaurant.BookFreeTableAsync(1, stoppingToken);
-                await _bus.Publish(new TableBooked(NewId.NextGuid(), result ?? false, NewId.NextGuid(), new Dish{ Id = Random.Shared.Next(1, 5) }),
-                    context => context.Durable = false, stoppingToken);
+
+                await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = Random.Shared.Next(1, 5) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15))), 
+                    stoppingToken);
             }
         }
     }
