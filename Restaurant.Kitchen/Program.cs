@@ -1,10 +1,9 @@
 ﻿#region references
 using System.Text;
-using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Kitchen;
-using Restaurant.Kitchen.Consumers;
+using Restaurant.Kitchen.Extensions;
 #endregion
 
 #region main
@@ -13,21 +12,11 @@ CreateHostBuilder(args).Build().Run();
 #endregion
 
 #region methods
-
 static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
-            services.AddMassTransit(configure =>
-            {
-                configure.AddConsumer<KitchenTableBookedConsumer>()
-                    .Endpoint(config => config.Temporary = true);
-
-                configure.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
+            services.AddAndConfigMassTransit();
 
             services.AddSingleton<Manager>();
         });
