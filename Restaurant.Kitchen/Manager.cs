@@ -1,4 +1,5 @@
-﻿using Restaurant.Messages;
+﻿using Restaurant.Kitchen.Exceptions;
+using Restaurant.Messages;
 
 namespace Restaurant.Kitchen
 {
@@ -18,6 +19,8 @@ namespace Restaurant.Kitchen
                 case (int)Dishes.Potato:
                     dish.Name = Dishes.Potato.ToString();
                     return (false, dish);
+                case (int)Dishes.Lasagna:
+                    throw new LasagnaException($"Был принят предзаказ [{orderId}] с {Dishes.Lasagna}");
                 default:
                     throw new ArgumentOutOfRangeException();
             }

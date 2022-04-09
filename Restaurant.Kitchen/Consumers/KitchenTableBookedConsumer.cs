@@ -20,14 +20,14 @@ namespace Restaurant.Kitchen.Consumers
             Console.WriteLine($"[Заказ {context.Message.OrderId}] Проверка на кухне займет: {random}");
             await Task.Delay(random);
             
-            var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder);
+            var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder!);
             if (confirmation)
             {
               await context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
             }
             else
             {
-               await context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!));
+                await context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish!));
             }
         }
     }
