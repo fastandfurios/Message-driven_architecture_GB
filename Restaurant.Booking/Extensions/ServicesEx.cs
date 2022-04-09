@@ -45,15 +45,15 @@ namespace Restaurant.Booking.Extensions
                     })
                     .Endpoint(cfg => cfg.Temporary = true);
 
-                configure.AddConsumer<BookingRequestFaultConsumer>(configurator =>
+                configure.AddConsumer<BookingRequestFaultConsumer>(cfg =>
                     {
-                        configurator.UseScheduledRedelivery(config =>
+                        cfg.UseScheduledRedelivery(config =>
                         {
                             config.Intervals(TimeSpan.FromSeconds(10),
                                 TimeSpan.FromSeconds(20),
                                 TimeSpan.FromSeconds(30));
                         });
-                        configurator.UseMessageRetry(config =>
+                        cfg.UseMessageRetry(config =>
                         {
                             config.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
                                 intervalIncrement: TimeSpan.FromSeconds(2));
