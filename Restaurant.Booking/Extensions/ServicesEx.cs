@@ -45,20 +45,7 @@ namespace Restaurant.Booking.Extensions
                     })
                     .Endpoint(cfg => cfg.Temporary = true);
 
-                configure.AddConsumer<BookingRequestFaultConsumer>(cfg =>
-                    {
-                        cfg.UseScheduledRedelivery(config =>
-                        {
-                            config.Intervals(TimeSpan.FromSeconds(10),
-                                TimeSpan.FromSeconds(20),
-                                TimeSpan.FromSeconds(30));
-                        });
-                        cfg.UseMessageRetry(config =>
-                        {
-                            config.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
-                                intervalIncrement: TimeSpan.FromSeconds(2));
-                        });
-                    })
+                configure.AddConsumer<BookingRequestFaultConsumer>()
                     .Endpoint(cfg => cfg.Temporary = true);
 
                 configure.AddSagaStateMachine<RestaurantBookingSaga, RestaurantBooking>()

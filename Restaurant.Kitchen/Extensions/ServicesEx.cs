@@ -29,20 +29,7 @@ namespace Restaurant.Kitchen.Extensions
                     });
                 }).Endpoint(config => config.Temporary = true);
 
-                configure.AddConsumer<KitchenFaultConsumer>(cfg =>
-                    {
-                        cfg.UseScheduledRedelivery(config =>
-                        {
-                            config.Intervals(TimeSpan.FromSeconds(10),
-                                TimeSpan.FromSeconds(20),
-                                TimeSpan.FromSeconds(30));
-                        });
-                        cfg.UseMessageRetry(config =>
-                        {
-                            config.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
-                                intervalIncrement: TimeSpan.FromSeconds(2));
-                        });
-                    })
+                configure.AddConsumer<KitchenFaultConsumer>()
                     .Endpoint(cfg => cfg.Temporary = true);
 
                 configure.AddDelayedMessageScheduler();
