@@ -20,12 +20,26 @@ namespace Restaurant.Booking
             Console.OutputEncoding = Encoding.UTF8;
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(millisecondsDelay: 10000, stoppingToken);
-                Console.WriteLine("Привет! Желаете забронировать столик?");
+                for (int i = 1; i <= 4; i++)
+                {
+                    await Task.Delay(millisecondsDelay: 10000, stoppingToken);
 
-                await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = Random.Shared.Next(1, 5) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15))), 
-                    stoppingToken);
+                    Console.WriteLine("Привет! Желаете забронировать столик?");
+
+                    await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = GetId(i) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15))),
+                        stoppingToken);
+                }
             }
+        }
+
+        private int GetId(int i)
+        {
+            var number = 6;
+
+            if (i < 4)
+                return Random.Shared.Next(1, 5);
+
+            return number;
         }
     }
 }
