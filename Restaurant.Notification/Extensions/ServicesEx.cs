@@ -16,9 +16,7 @@ namespace Restaurant.Notification.Extensions
                     {
                         configurator.UseScheduledRedelivery(cfg =>
                         {
-                            cfg.Intervals(TimeSpan.FromSeconds(10),
-                                TimeSpan.FromSeconds(20),
-                                TimeSpan.FromSeconds(30));
+                            cfg.Interval(1, TimeSpan.FromSeconds(10));
                         });
                         configurator.UseMessageRetry(cfg =>
                         {

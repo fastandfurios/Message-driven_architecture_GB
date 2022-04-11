@@ -17,9 +17,7 @@ namespace Restaurant.Kitchen.Extensions
                 {
                     cfg.UseScheduledRedelivery(config =>
                     {
-                        config.Intervals(TimeSpan.FromSeconds(10),
-                            TimeSpan.FromSeconds(20),
-                            TimeSpan.FromSeconds(30));
+                        config.Interval(1, TimeSpan.FromSeconds(2));
                     });
                     cfg.UseMessageRetry(config =>
                     {
@@ -28,6 +26,8 @@ namespace Restaurant.Kitchen.Extensions
                         config.Handle<LasagnaException>();
                     });
                 });
+
+                configure.AddConsumer<KitchenTableBookedConsumer>();
 
                 configure.AddConsumer<KitchenFaultConsumer>();
 
