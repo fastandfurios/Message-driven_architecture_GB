@@ -18,6 +18,9 @@ namespace Restaurant.Kitchen
                 case (int)Dishes.Potato:
                     dish.Name = Dishes.Potato.ToString();
                     return (false, dish);
+                case (int)Dishes.Lasagna:
+                    dish.Name = Dishes.Lasagna.ToString();
+                    return (false, dish);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

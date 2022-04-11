@@ -33,10 +33,13 @@ namespace Restaurant.Booking.Saga
             Event(() => BookingRequestFault,
                 cfg => cfg.CorrelateById(prop => prop.Message.Message.OrderId));
 
+            Event(() => NotificationFault,
+                cfg => cfg.CorrelateById(prop => prop.Message.Message.OrderId));
+
             Schedule(() => BookingExpired,
                 token => token.ExpirationId, cfg =>
                 {
-                    cfg.Delay = TimeSpan.FromSeconds(5);
+                    cfg.Delay = TimeSpan.FromSeconds(100);
                     cfg.Received = e => e.CorrelateById(context => context.Message.OrderId);
                 });
 
@@ -86,6 +89,10 @@ namespace Restaurant.Booking.Saga
                         "Приносим извенения, стол забронировать не получилось."))
                     .Finalize(),
 
+                When(NotificationFault)
+                    .Then(action => Console.WriteLine("В сервисе уведомлений произошла ошибка. Уведомление не будет отправлено"))
+                    .Finalize(),
+
                 When(BookingExpired!.Received)
                     .Then(action => Console.WriteLine($"Отмена заказа {action.Saga.OrderId}"))
                     .Finalize(),
@@ -93,7 +100,7 @@ namespace Restaurant.Booking.Saga
                 When(KitchenAccident)
                     .Publish(factory => (INotify)new Notify(factory.Saga.ClientId,
                         factory.Saga.OrderId,
-                        $"Отмена бронирования стола по заказу в связи с отсутсвием блюда!"))
+                        $"Отмена бронирования стола по заказу в связи с отсутсвием блюда {factory.Message.Dish.Name}!"))
                     .Finalize()
             );
 
@@ -121,6 +128,7 @@ namespace Restaurant.Booking.Saga
         public Schedule<RestaurantBooking, IBookingExpire> BookingExpired { get; private set; }
         public Event<IBookingRequest> BookingRequested { get; private set; }
         public Event<Fault<IBookingRequest>> BookingRequestFault { get; private set; }
+        public Event<Fault<INotify>> NotificationFault { get; private set; }
         public Event<IKitchenReady> KitchenReady { get; private set; }
         public Event<ITableBooked> TableBooked { get; private set; }
         public Event<IKitchenAccident> KitchenAccident { get; private set; }
