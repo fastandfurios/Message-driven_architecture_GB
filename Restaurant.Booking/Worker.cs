@@ -22,7 +22,7 @@ namespace Restaurant.Booking
             {
                 for (int i = 1; i <= 4; i++)
                 {
-                    await Task.Delay(millisecondsDelay: 10000, stoppingToken);
+                    await Task.Delay(millisecondsDelay: 20000, stoppingToken);
 
                     Console.WriteLine("Привет! Желаете забронировать столик?");
 
