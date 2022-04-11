@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Booking.Consumers;
 using Restaurant.Booking.Saga;
+using Restaurant.Messages.Implementation;
 
 namespace Restaurant.Booking.Extensions
 {
@@ -26,8 +27,7 @@ namespace Restaurant.Booking.Extensions
                             config.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
                                 intervalIncrement: TimeSpan.FromSeconds(2));
                         });
-                    })
-                    .Endpoint(cfg => cfg.Temporary = true);
+                    });
 
                 configure.AddConsumer<KitchenAccidentConsumer>(configurator =>
                     {
@@ -42,14 +42,10 @@ namespace Restaurant.Booking.Extensions
                             config.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
                                 intervalIncrement: TimeSpan.FromSeconds(2));
                         });
-                    })
-                    .Endpoint(cfg => cfg.Temporary = true);
-
-                configure.AddConsumer<BookingRequestFaultConsumer>()
-                    .Endpoint(cfg => cfg.Temporary = true);
+                    });
+                configure.AddConsumer<BookingRequestFaultConsumer>();
 
                 configure.AddSagaStateMachine<RestaurantBookingSaga, RestaurantBooking>()
-                    .Endpoint(cfg => cfg.Temporary = true)
                     .InMemoryRepository();
 
                 configure.AddDelayedMessageScheduler();

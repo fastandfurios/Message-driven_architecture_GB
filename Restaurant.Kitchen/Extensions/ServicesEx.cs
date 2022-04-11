@@ -27,10 +27,9 @@ namespace Restaurant.Kitchen.Extensions
                             intervalIncrement: TimeSpan.FromSeconds(2));
                         config.Handle<LasagnaException>();
                     });
-                }).Endpoint(config => config.Temporary = true);
+                });
 
-                configure.AddConsumer<KitchenFaultConsumer>()
-                    .Endpoint(cfg => cfg.Temporary = true);
+                configure.AddConsumer<KitchenFaultConsumer>();
 
                 configure.AddDelayedMessageScheduler();
 

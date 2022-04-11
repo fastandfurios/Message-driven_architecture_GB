@@ -25,11 +25,9 @@ namespace Restaurant.Notification.Extensions
                             cfg.Incremental(retryLimit: 3, initialInterval: TimeSpan.FromSeconds(1),
                                 intervalIncrement: TimeSpan.FromSeconds(2));
                         });
-                    })
-                    .Endpoint(configure => configure.Temporary = true);
+                    });
 
-                config.AddConsumer<NotifyFaultConsumer>()
-                    .Endpoint(configure => configure.Temporary = true);
+                config.AddConsumer<NotifyFaultConsumer>();
 
                 config.AddDelayedMessageScheduler();
 
