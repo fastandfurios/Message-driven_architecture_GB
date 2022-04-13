@@ -28,7 +28,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
             services.AddTransient<Restaurant.Booking.Restaurant>();
 
-            services.AddTransient<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>();
+            services.AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>();
 
             services.AddHostedService<Worker>();
         });
