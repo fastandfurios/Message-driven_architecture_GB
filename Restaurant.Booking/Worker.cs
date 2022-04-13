@@ -26,7 +26,7 @@ namespace Restaurant.Booking
 
                     Console.WriteLine("Привет! Желаете забронировать столик?");
 
-                    await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = GetId(i) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15))),
+                    await _bus.Publish(new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), new Dish { Id = GetId(i) }, TimeSpan.FromSeconds(Random.Shared.Next(7, 15)), DateTime.Now),
                         stoppingToken);
                 }
             }
