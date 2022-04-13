@@ -4,6 +4,7 @@ using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 using Restaurant.Messages.Repositories.Interfaces;
 
+#nullable disable
 namespace Restaurant.Booking.Consumers
 {
     public class BookingRequestConsumer : IConsumer<IBookingRequest>
@@ -19,9 +20,28 @@ namespace Restaurant.Booking.Consumers
 
         public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
-            Console.WriteLine($"[Заказ с номером: {context.Message.OrderId}]");
-            var result = await _restaurant.BookFreeTableAsync(1);
+            var model = _repository.Get().FirstOrDefault(model => model.OrderId == context.Message.OrderId);
 
+            if (model is not null && model.CheckMessageId(context.MessageId.ToString()))
+            {
+                Console.WriteLine(context.MessageId.ToString());
+                Console.WriteLine("Second time");
+                return;
+            }
+
+            var requestModel = new BookingRequestModel(context.Message.OrderId,
+                context.Message.ClientId,
+                context.Message.PreOrder,
+                context.Message.CreationDate,
+                context.MessageId.ToString(),
+                context.Message.ArrivalTime);
+
+            Console.WriteLine(context.MessageId.ToString());
+            Console.WriteLine("First time");
+            var resultModel = model?.Update(requestModel, context.MessageId.ToString()) ?? requestModel;
+
+            _repository.AddOrUpdate(resultModel);
+            var result = await _restaurant.BookFreeTableAsync(1);
             await context.Publish<ITableBooked>(new TableBooked(context.Message.OrderId, result ?? false));
         }
     }
