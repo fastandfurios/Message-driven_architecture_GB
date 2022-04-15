@@ -41,6 +41,9 @@ namespace Restaurant.Booking.Consumers
             var resultModel = model?.Update(requestModel, context.MessageId.ToString()) ?? requestModel;
 
             _repository.AddOrUpdate(resultModel);
+
+
+
             var result = await _restaurant.BookFreeTableAsync(1);
             await context.Publish<ITableBooked>(new TableBooked(context.Message.OrderId, result ?? false));
         }

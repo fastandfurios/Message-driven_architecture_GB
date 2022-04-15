@@ -16,5 +16,10 @@ namespace Restaurant.Messages.Repositories.Implementation
         {
             return _repository;
         }
+
+        public void Delete()
+        {
+            _ = _repository.TryTake(out var result);
+        }
     }
 }

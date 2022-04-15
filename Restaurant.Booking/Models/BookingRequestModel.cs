@@ -24,6 +24,7 @@ namespace Restaurant.Booking.Models
             ClientId = model.ClientId;
             PreOrder = model.PreOrder;
             CreationDate = model.CreationDate;
+            ArrivalTime = model.ArrivalTime;
 
             return this;
         }
