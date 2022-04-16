@@ -4,5 +4,6 @@
     {
         void AddOrUpdate(T entity);
         IEnumerable<T> Get();
+        void Delete();
     }
 }
