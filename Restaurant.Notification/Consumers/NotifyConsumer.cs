@@ -38,6 +38,8 @@ namespace Restaurant.Notification.Consumers
             var resultModel = model?.Update(requestModel, context.Message.ToString()!) ?? requestModel;
 
             _repository.AddOrUpdate(resultModel);
+            _ = new Timer(_ => _repository.Delete(), null, 30000, 0);
+
             _notifier.Notify(context.Message.OrderId, context.Message.ClientId, context.Message.Message);
             
             return context.ConsumeCompleted;
