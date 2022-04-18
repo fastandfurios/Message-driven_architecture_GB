@@ -13,7 +13,6 @@ namespace Restaurant.Kitchen.Consumers
     {
         private readonly Manager _manager;
         private readonly IKitchenMessageRepository<KitchenTableBookedModel> _repository;
-        private int _count;
 
         public KitchenTableBookedConsumer(Manager manager, IKitchenMessageRepository<KitchenTableBookedModel> repository)
         {
@@ -27,7 +26,6 @@ namespace Restaurant.Kitchen.Consumers
             {
                 _repository.Add(new KitchenTableBookedModel
                 {
-                    Id = ++_count,
                     MessageId = context.MessageId!.Value,
                     OrderId = context.Message.OrderId
                 });
