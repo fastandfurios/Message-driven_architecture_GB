@@ -2,7 +2,7 @@
 
 namespace Restaurant.Kitchen.DAL.Migrations
 {
-    [Migration(2)]
+    [Migration(1)]
     public class FirstMigration : Migration
     {
         public override void Up()
