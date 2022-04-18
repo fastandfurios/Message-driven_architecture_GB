@@ -27,7 +27,9 @@ namespace Restaurant.Kitchen.DAL.Repositories.Implementation
 
         public IEnumerable<KitchenTableBookedModel> Get()
         {
-            throw new NotImplementedException();
+            using var connection = _connection.GetOpenedConnection();
+
+            return connection.Query<KitchenTableBookedModel>("SELECT * FROM KitchenMessages");
         }
     }
 }
