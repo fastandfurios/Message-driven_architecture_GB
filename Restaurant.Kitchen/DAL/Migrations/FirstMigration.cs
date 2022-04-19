@@ -8,8 +8,9 @@ namespace Restaurant.Kitchen.DAL.Migrations
         public override void Up()
         {
             Create.Table("KitchenMessages")
-                .WithColumn("OrderId").AsGuid().PrimaryKey()
-                .WithColumn("MessageId").AsGuid();
+                .WithColumn("MessageId").AsGuid().PrimaryKey()
+                .WithColumn("OrderId").AsGuid();
+
         }
 
         public override void Down()
