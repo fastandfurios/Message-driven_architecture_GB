@@ -1,21 +1,24 @@
-﻿using MassTransit;
+﻿#nullable disable
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using Restaurant.Booking.Models;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 using Restaurant.Messages.Repositories.Interfaces;
 
-#nullable disable
 namespace Restaurant.Booking.Consumers
 {
     public class BookingRequestConsumer : IConsumer<IBookingRequest>
     {
         private readonly Restaurant _restaurant;
         private readonly IInMemoryRepository<BookingRequestModel> _repository;
+        private readonly ILogger<BookingRequestConsumer> _logger;
 
-        public BookingRequestConsumer(Restaurant restaurant, IInMemoryRepository<BookingRequestModel> repository)
+        public BookingRequestConsumer(Restaurant restaurant, IInMemoryRepository<BookingRequestModel> repository, ILogger<BookingRequestConsumer> logger)
         {
             _restaurant = restaurant;
             _repository = repository;
+            _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<IBookingRequest> context)
@@ -24,8 +27,8 @@ namespace Restaurant.Booking.Consumers
 
             if (model is not null && model.CheckMessageId(context.MessageId.ToString()))
             {
-                Console.WriteLine(context.MessageId.ToString());
-                Console.WriteLine("Second time");
+                _logger.Log(LogLevel.Information, context.MessageId.ToString());
+                _logger.Log(LogLevel.Information, "Second time");
                 return;
             }
 
@@ -36,8 +39,8 @@ namespace Restaurant.Booking.Consumers
                 context.MessageId.ToString(),
                 context.Message.ArrivalTime);
 
-            Console.WriteLine(context.MessageId.ToString());
-            Console.WriteLine("First time");
+            _logger.Log(LogLevel.Information, context.MessageId.ToString());
+            _logger.Log(LogLevel.Information, "First time");
             var resultModel = model?.Update(requestModel, context.MessageId.ToString()) ?? requestModel;
 
             _repository.AddOrUpdate(resultModel);
