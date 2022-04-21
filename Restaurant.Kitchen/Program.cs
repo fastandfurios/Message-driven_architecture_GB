@@ -1,8 +1,10 @@
 ﻿#region references
 using System.Text;
+using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Kitchen;
+using Restaurant.Kitchen.Audit;
 using Restaurant.Kitchen.DAL.Models;
 using Restaurant.Kitchen.DAL.Repositories.Implementation;
 using Restaurant.Kitchen.DAL.Repositories.Interfaces;
@@ -19,6 +21,8 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddSingleton<IMessageAuditStore, AuditStore>();
+
             services.AddAndConfigMassTransit();
 
             services.AddSingleton<Manager>();
