@@ -1,10 +1,12 @@
 ﻿#region references
 using System.Text;
+using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Restaurant.Messages.Repositories.Implementation;
 using Restaurant.Messages.Repositories.Interfaces;
 using Restaurant.Notification;
+using Restaurant.Notification.Audit;
 using Restaurant.Notification.Extensions;
 using Restaurant.Notification.Models;
 #endregion
@@ -19,6 +21,8 @@ static IHostBuilder CreateHostBuilder(string[] args)
 => Host.CreateDefaultBuilder(args)
         .ConfigureServices((services) =>
         {
+            services.AddSingleton<IMessageAuditStore, AuditStore>();
+
             services.AddAndConfigMassTransit();
 
             services.AddSingleton<Notifier>();
