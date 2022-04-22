@@ -3,7 +3,6 @@ using System.Text;
 using MassTransit.Audit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Prometheus;
 using Restaurant.Booking;
 using Restaurant.Booking.Audit;
@@ -17,7 +16,7 @@ using Restaurant.Messages.Repositories.Interfaces;
 Console.OutputEncoding = Encoding.UTF8;
 
 #region services
-var builder = WebApplication.CreateBuilder();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
