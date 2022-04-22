@@ -3,7 +3,6 @@ using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Booking.Consumers;
 using Restaurant.Booking.Saga;
-using Restaurant.Messages.Implementation;
 
 namespace Restaurant.Booking.Extensions
 {
@@ -54,6 +53,7 @@ namespace Restaurant.Booking.Extensions
 
                 configure.UsingRabbitMq((context, cfg) =>
                 {
+                    cfg.UsePrometheusMetrics(serviceName: "booking_service");
                     cfg.UseDelayedMessageScheduler();
                     cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(context);
