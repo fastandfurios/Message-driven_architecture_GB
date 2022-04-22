@@ -26,37 +26,29 @@ namespace Restaurant.Kitchen.Consumers
 
         public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
-            try
+            _repository.Add(new KitchenTableBookedModel
             {
-                _repository.Add(new KitchenTableBookedModel
-                {
-                    MessageId = context.MessageId!.Value,
-                    OrderId = context.Message.OrderId
-                });
+                MessageId = context.MessageId!.Value,
+                OrderId = context.Message.OrderId
+            });
 
-                var random = new Random().Next(1000, 10000);
+            var random = new Random().Next(1000, 10000);
 
-                _logger.Log(LogLevel.Information, $"[OrderId {context.Message.OrderId}]");
-                Console.WriteLine($"Проверка на кухне займет: {random}");
-                await Task.Delay(random);
+            _logger.Log(LogLevel.Information, $"[OrderId {context.Message.OrderId}]");
+            Console.WriteLine($"Проверка на кухне займет: {random}");
+            await Task.Delay(random);
 
-                var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder!);
-                if (confirmation)
-                {
-                    await context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
-                }
-                else
-                {
-                    if (dish.Name.Equals(Dishes.Lasagna.ToString()))
-                        throw new LasagnaException($"Был принят предзаказ [{context.Message.OrderId}] с {Dishes.Lasagna}");
-
-                    await context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish));
-                }
+            var (confirmation, dish) = _manager.CheckKitchenReady(context.Message.OrderId, context.Message.PreOrder!);
+            if (confirmation)
+            {
+                await context.Publish<IKitchenReady>(new KitchenReady(context.Message.OrderId, true));
             }
-            catch (SQLiteException e)
+            else
             {
-                _logger.Log(LogLevel.Error, e.Message);
-                await context.ConsumeCompleted;
+                if (dish.Name.Equals(Dishes.Lasagna.ToString()))
+                    throw new LasagnaException($"Был принят предзаказ [{context.Message.OrderId}] с {Dishes.Lasagna}");
+
+                await context.Publish<IKitchenAccident>(new KitchenAccident(context.Message.OrderId, dish));
             }
         }
     }
