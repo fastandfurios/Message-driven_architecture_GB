@@ -35,6 +35,7 @@ namespace Restaurant.Notification.Extensions
 
                 config.UsingRabbitMq((context, cfg) =>
                 {
+                    cfg.UsePrometheusMetrics(serviceName: "notification_service");
                     cfg.UseDelayedMessageScheduler();
                     cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(registration: context);
