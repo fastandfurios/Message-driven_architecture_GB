@@ -2,6 +2,7 @@
 using System.Text;
 using MassTransit.Audit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Prometheus;
 using Restaurant.Kitchen;
@@ -16,6 +17,8 @@ Console.OutputEncoding = Encoding.UTF8;
 
 #region services
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.UseUrls(urls: "http://localhost:5050");
 
 builder.Services.AddControllers();
 
