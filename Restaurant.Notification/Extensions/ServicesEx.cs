@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Notification.Consumers;
 
@@ -10,6 +11,9 @@ namespace Restaurant.Notification.Extensions
         /// <param name="services">service collection interface</param>
         internal static void AddAndConfigMassTransit(this IServiceCollection services)
         {
+            var serviceProvider = services.BuildServiceProvider();
+            var auditStore = serviceProvider.GetService<IMessageAuditStore>();
+
             services.AddMassTransit(config =>
             {
                 config.AddConsumer<NotifyConsumer>(configurator =>
@@ -34,6 +38,8 @@ namespace Restaurant.Notification.Extensions
                     cfg.UseDelayedMessageScheduler();
                     cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(registration: context);
+                    cfg.ConnectSendAuditObservers(auditStore);
+                    cfg.ConnectConsumeAuditObserver(auditStore);
                 });
             });
         }

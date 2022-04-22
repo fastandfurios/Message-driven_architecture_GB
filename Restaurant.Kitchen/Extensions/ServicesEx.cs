@@ -1,5 +1,6 @@
 ﻿using FluentMigrator.Runner;
 using MassTransit;
+using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Kitchen.Consumers;
 using Restaurant.Kitchen.Exceptions;
@@ -12,6 +13,9 @@ namespace Restaurant.Kitchen.Extensions
         /// <param name="services">service collection interface</param>
         internal static void AddAndConfigMassTransit(this IServiceCollection services)
         {
+            var serviceProvider = services.BuildServiceProvider();
+            var auditStore = serviceProvider.GetService<IMessageAuditStore>();
+
             services.AddMassTransit(configure =>
             {
                 configure.AddConsumer<KitchenTableBookedConsumer>(cfg =>
@@ -39,6 +43,8 @@ namespace Restaurant.Kitchen.Extensions
                     cfg.UseDelayedMessageScheduler();
                     cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(context);
+                    cfg.ConnectSendAuditObservers(auditStore);
+                    cfg.ConnectConsumeAuditObserver(auditStore);
                 });
             });
         }
