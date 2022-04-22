@@ -1,8 +1,9 @@
 ﻿#region references
 using System.Text;
 using MassTransit.Audit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Prometheus;
 using Restaurant.Kitchen;
 using Restaurant.Kitchen.Audit;
 using Restaurant.Kitchen.DAL.Models;
@@ -11,26 +12,34 @@ using Restaurant.Kitchen.DAL.Repositories.Interfaces;
 using Restaurant.Kitchen.Extensions;
 #endregion
 
-#region main
 Console.OutputEncoding = Encoding.UTF8;
-CreateHostBuilder(args).Build().Run();
+
+#region services
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton<IMessageAuditStore, AuditStore>();
+
+builder.Services.AddAndConfigMassTransit();
+
+builder.Services.AddSingleton<Manager>();
+
+builder.Services.AddSingleton<IKitchenMessageRepository<KitchenTableBookedModel>, KitchenMessageRepository>();
+
+builder.Services.AddSingleton<IConnection, Connection>();
+
+builder.Services.SqLiteConfiguring("Data Source=C:\\Test\\Messages.db;Version=3;New=True;Compress=True;");
 #endregion
 
-#region methods
-static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
-        .ConfigureServices((hostContext, services) =>
-        {
-            services.AddSingleton<IMessageAuditStore, AuditStore>();
+#region pipeline
+var app = builder.Build();
 
-            services.AddAndConfigMassTransit();
+app.UseRouting();
 
-            services.AddSingleton<Manager>();
+app.MapMetrics();
 
-            services.AddSingleton<IKitchenMessageRepository<KitchenTableBookedModel>, KitchenMessageRepository>();
+app.MapControllers();
 
-            services.AddSingleton<IConnection, Connection>();
-
-            services.SqLiteConfiguring("Data Source=C:\\Test\\Messages.db;Version=3;New=True;Compress=True;");
-        });
+app.Run();
 #endregion

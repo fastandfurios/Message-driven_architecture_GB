@@ -40,6 +40,7 @@ namespace Restaurant.Kitchen.Extensions
 
                 configure.UsingRabbitMq((context, cfg) =>
                 {
+                    cfg.UsePrometheusMetrics(serviceName: "kitchen_service");
                     cfg.UseDelayedMessageScheduler();
                     cfg.UseInMemoryOutbox();
                     cfg.ConfigureEndpoints(context);
