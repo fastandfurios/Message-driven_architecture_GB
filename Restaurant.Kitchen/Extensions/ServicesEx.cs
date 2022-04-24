@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using FluentMigrator.Runner;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Kitchen.Consumers;
 using Restaurant.Kitchen.Exceptions;
@@ -40,6 +41,23 @@ namespace Restaurant.Kitchen.Extensions
                     cfg.ConfigureEndpoints(context);
                 });
             });
+        }
+
+        /// <summary> Configures SqLite </summary>
+        /// <param name="services">service collection interface</param>
+        /// <param name="connectionString">connection string</param>
+        internal static void SqLiteConfiguring(this IServiceCollection services, string connectionString)
+        {
+            var service = services.AddFluentMigratorCore()
+                .ConfigureRunner(cfg => cfg.AddSQLite()
+                    .WithGlobalConnectionString(connectionString)
+                    .ScanIn(typeof(Program).Assembly).For.Migrations())
+                .AddLogging(cfg => cfg.AddFluentMigratorConsole())
+                .BuildServiceProvider(false);
+
+            var runner = service.CreateScope().ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+            runner.MigrateUp();
         }
     }
 }

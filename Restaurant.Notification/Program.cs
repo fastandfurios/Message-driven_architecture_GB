@@ -2,8 +2,11 @@
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Restaurant.Messages.Repositories.Implementation;
+using Restaurant.Messages.Repositories.Interfaces;
 using Restaurant.Notification;
 using Restaurant.Notification.Extensions;
+using Restaurant.Notification.Models;
 #endregion
 
 #region main
@@ -19,5 +22,7 @@ static IHostBuilder CreateHostBuilder(string[] args)
             services.AddAndConfigMassTransit();
 
             services.AddSingleton<Notifier>();
+
+            services.AddSingleton<IInMemoryRepository<NotifyModel>, InMemoryRepository<NotifyModel>>();
         });
 #endregion
