@@ -21,7 +21,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Restaurant.Booking\Restaurant.Booking.csproj" />
+    <ProjectReference Include="..\Restaurant.Kitchen\Restaurant.Kitchen.csproj" />
     <ProjectReference Include="..\Restaurant.Messages\Restaurant.Messages.csproj" />
+    <ProjectReference Include="..\Restaurant.Notification\Restaurant.Notification.csproj" />
   </ItemGroup>
 
 </Project>
