@@ -15,7 +15,7 @@ using Restaurant.Messages.Repositories.Interfaces;
 
 namespace Restaurant.Tests
 {
-    public class ConsumerTests
+    public class ConsumerTests : ITests
     {
         private ServiceProvider _provider;
         private InMemoryTestHarness _harness;
@@ -33,7 +33,7 @@ namespace Restaurant.Tests
                 .AddLogging()
                 .AddTransient<Booking.Restaurant>()
                 .AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>()
-                .BuildServiceProvider(true);
+                .BuildServiceProvider(validateScopes: true);
 
             _harness = _provider.GetRequiredService<InMemoryTestHarness>();
 
