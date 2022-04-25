@@ -24,7 +24,7 @@ namespace Restaurant.Tests
         private InMemoryTestHarness _harness;
 
         [OneTimeSetUp]
-        [System.Obsolete]
+        [Obsolete("Obsolete")]
         public async Task Init()
         {
             _provider = DependencyInjectionTestingExtensions.AddMassTransitInMemoryTestHarness(new ServiceCollection(), cfg =>
@@ -81,6 +81,7 @@ namespace Restaurant.Tests
             Assert.That(await _harness.Published.Any<ITableBooked>());
             Assert.That(await _harness.Published.Any<IKitchenReady>());
             Assert.That(await _harness.Published.Any<INotify>());
+            Assert.That(saga.CurrentState, Is.EqualTo(2));
 
             await _harness.OutputTimeline(TestContext.Out, options => options.Now().IncludeAddress());
         }
