@@ -1,5 +1,4 @@
-﻿using System.Data.SQLite;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using Restaurant.Kitchen.DAL.Models;
 using Restaurant.Kitchen.DAL.Repositories.Interfaces;
