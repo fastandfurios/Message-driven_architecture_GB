@@ -24,25 +24,19 @@ namespace Restaurant.Tests
     public class ConsumerTests : ITests
     {
         private ServiceProvider _provider;
-        private InMemoryTestHarness _harness;
+        private ITestHarness _harness;
 
         [OneTimeSetUp]
-        [Obsolete("Obsolete")]
         public async Task Init()
         {
             _provider = new ServiceCollection()
-                .AddMassTransitInMemoryTestHarness(cfg =>
+                .AddMassTransitTestHarness(cfg =>
                 {
                     cfg.AddConsumer<BookingRequestConsumer>();
-                    cfg.AddConsumerTestHarness<BookingRequestConsumer>();
                     cfg.AddConsumer<KitchenTableBookedConsumer>();
-                    cfg.AddConsumerTestHarness<KitchenTableBookedConsumer>();
                     cfg.AddConsumer<NotifyConsumer>();
-                    cfg.AddConsumerTestHarness<NotifyConsumer>();
                     cfg.AddConsumer<KitchenAccidentConsumer>();
-                    cfg.AddConsumerTestHarness<KitchenAccidentConsumer>();
                     cfg.AddConsumer<BookingRequestFaultConsumer>();
-                    cfg.AddConsumerTestHarness<BookingRequestFaultConsumer>();
                 })
                 .AddLogging()
                 .AddTransient<Booking.Restaurant>()
@@ -52,7 +46,7 @@ namespace Restaurant.Tests
                 .AddSingleton<Manager>()
                 .BuildServiceProvider(validateScopes: true);
 
-            _harness = _provider.GetRequiredService<InMemoryTestHarness>();
+            _harness = _provider.GetTestHarness();
 
             await _harness.Start();
         }
@@ -60,7 +54,7 @@ namespace Restaurant.Tests
         [OneTimeTearDown]
         public async Task TearDown()
         {
-            await _harness.Stop();
+            //await _harness.OutputTimeline(TestContext.Out, options => options.Now().IncludeAddress());
             await _provider.DisposeAsync();
         }
 
@@ -83,7 +77,7 @@ namespace Restaurant.Tests
         [Test]
         public async Task Booking_request_consumer_published_table_booked_message()
         {
-            var consumer = _provider.GetRequiredService<IConsumerTestHarness<BookingRequestConsumer>>();
+            var consumer = _harness.GetConsumerHarness<BookingRequestConsumer>();
 
             var orderId = Guid.NewGuid();
             var bus = _provider.GetRequiredService<IBus>();
@@ -149,7 +143,7 @@ namespace Restaurant.Tests
         [Test]
         public async Task Booking_request_consumer_publication_accident_report()
         {
-            var consumer = _provider.GetRequiredService<IConsumerTestHarness<KitchenTableBookedConsumer>>();
+            var consumer = _harness.GetConsumerHarness<KitchenTableBookedConsumer>();
 
             var orderId = Guid.NewGuid();
             var bus = _provider.GetRequiredService<IBus>();
