@@ -14,7 +14,6 @@ using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 using Restaurant.Messages.Repositories.Implementation;
 using Restaurant.Messages.Repositories.Interfaces;
-using DependencyInjectionTestingExtensions = MassTransit.Testing.DependencyInjectionTestingExtensions;
 
 namespace Restaurant.Tests
 {
@@ -27,7 +26,8 @@ namespace Restaurant.Tests
         [Obsolete("Obsolete")]
         public async Task Init()
         {
-            _provider = DependencyInjectionTestingExtensions.AddMassTransitInMemoryTestHarness(new ServiceCollection(), cfg =>
+            _provider = new ServiceCollection()
+                .AddMassTransitInMemoryTestHarness(cfg =>
                 {
                     cfg.AddConsumer<KitchenTableBookedConsumer>();
                     cfg.AddConsumerTestHarness<KitchenTableBookedConsumer>();
@@ -39,7 +39,7 @@ namespace Restaurant.Tests
                 .AddLogging()
                 .AddTransient<Booking.Restaurant>()
                 .AddTransient<Manager>()
-                .AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>()
+                .AddSingleton<IInMemoryRepository<IBookingRequest>, InMemoryRepository<IBookingRequest>>()
                 .BuildServiceProvider(validateScopes: true);
 
             _harness = _provider.GetRequiredService<InMemoryTestHarness>();
@@ -60,10 +60,10 @@ namespace Restaurant.Tests
             var orderId = NewId.NextGuid();
             var clientId = NewId.NextGuid();
 
-            await _harness.Bus.Publish(new BookingRequest(orderId,
-                clientId,
-                new Dish{ Id = Random.Shared.Next(1, 6) },
-                TimeSpan.FromSeconds(Random.Shared.Next(7, 15)),
+            await _harness.Bus.Publish(new BookingRequest(clientId,
+                orderId,
+                new Dish{ Id = 1 },
+                TimeSpan.FromSeconds(8),
                 DateTime.Now));
 
             Assert.That(await _harness.Published.Any<IBookingRequest>());
@@ -81,7 +81,6 @@ namespace Restaurant.Tests
             Assert.That(await _harness.Published.Any<ITableBooked>());
             Assert.That(await _harness.Published.Any<IKitchenReady>());
             Assert.That(await _harness.Published.Any<INotify>());
-            Assert.That(saga.CurrentState, Is.EqualTo(2));
 
             await _harness.OutputTimeline(TestContext.Out, options => options.Now().IncludeAddress());
         }
