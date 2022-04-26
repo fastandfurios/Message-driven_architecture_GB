@@ -9,6 +9,9 @@ using Restaurant.Booking.Consumers;
 using Restaurant.Booking.Models;
 using Restaurant.Kitchen;
 using Restaurant.Kitchen.Consumers;
+using Restaurant.Kitchen.DAL.Models;
+using Restaurant.Kitchen.DAL.Repositories.Implementation;
+using Restaurant.Kitchen.DAL.Repositories.Interfaces;
 using Restaurant.Messages;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
@@ -38,10 +41,14 @@ namespace Restaurant.Tests
                     cfg.AddConsumerTestHarness<NotifyConsumer>();
                     cfg.AddConsumer<KitchenAccidentConsumer>();
                     cfg.AddConsumerTestHarness<KitchenAccidentConsumer>();
+                    cfg.AddConsumer<BookingRequestFaultConsumer>();
+                    cfg.AddConsumerTestHarness<BookingRequestFaultConsumer>();
                 })
                 .AddLogging()
                 .AddTransient<Booking.Restaurant>()
                 .AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>()
+                .AddSingleton<IKitchenMessageRepository<KitchenTableBookedModel>, KitchenMessageRepository>()
+                .AddSingleton<IConnection, Connection>()
                 .AddSingleton<Manager>()
                 .BuildServiceProvider(validateScopes: true);
 
@@ -135,6 +142,31 @@ namespace Restaurant.Tests
                 new Dish()));
 
             Assert.That(await _harness.Consumed.Any<IKitchenAccident>());
+
+            await _harness.OutputTimeline(TestContext.Out, options => options.Now().IncludeAddress());
+        }
+
+        [Test]
+        public async Task Booking_request_consumer_publication_accident_report()
+        {
+            var consumer = _provider.GetRequiredService<IConsumerTestHarness<KitchenTableBookedConsumer>>();
+
+            var orderId = Guid.NewGuid();
+            var bus = _provider.GetRequiredService<IBus>();
+
+            await bus.Publish<IBookingRequest>(
+                new BookingRequest(
+                    orderId,
+                    orderId,
+                    new Dish { Id = 5 },
+                    TimeSpan.FromSeconds(Random.Shared.Next(7, 15)),
+                    DateTime.Now));
+
+            Assert.That(consumer.Consumed.Select<IBookingRequest>()
+                .Any(predicate => predicate.Context.Message.OrderId == orderId), Is.True);
+
+            Assert.That(_harness.Published.Select<IKitchenAccident>()
+                .Any(predicate => predicate.Context.Message.OrderId == orderId), Is.True);
 
             await _harness.OutputTimeline(TestContext.Out, options => options.Now().IncludeAddress());
         }
