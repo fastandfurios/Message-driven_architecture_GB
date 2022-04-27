@@ -9,11 +9,17 @@ using Restaurant.Booking.Models;
 using Restaurant.Booking.Saga;
 using Restaurant.Kitchen;
 using Restaurant.Kitchen.Consumers;
+using Restaurant.Kitchen.DAL.Models;
+using Restaurant.Kitchen.DAL.Repositories.Implementation;
+using Restaurant.Kitchen.DAL.Repositories.Interfaces;
 using Restaurant.Messages;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 using Restaurant.Messages.Repositories.Implementation;
 using Restaurant.Messages.Repositories.Interfaces;
+using Restaurant.Notification;
+using Restaurant.Notification.Consumers;
+using Restaurant.Notification.Models;
 
 namespace Restaurant.Tests
 {
@@ -32,14 +38,23 @@ namespace Restaurant.Tests
                     cfg.AddConsumer<KitchenTableBookedConsumer>();
                     cfg.AddConsumerTestHarness<KitchenTableBookedConsumer>();
                     cfg.AddConsumer<BookingRequestConsumer>();
+                    cfg.AddConsumerTestHarness<BookingRequestConsumer>();
+                    cfg.AddConsumer<NotifyConsumer>();
+                    cfg.AddConsumerTestHarness<NotifyConsumer>();
+                    cfg.AddConsumer<KitchenAccidentConsumer>();
+                    cfg.AddConsumerTestHarness<KitchenAccidentConsumer>();
 
                     cfg.AddSagaStateMachine<RestaurantBookingSaga, RestaurantBooking>().InMemoryRepository();
                     cfg.AddSagaStateMachineTestHarness<RestaurantBookingSaga, RestaurantBooking>();
                 })
                 .AddLogging()
                 .AddTransient<Booking.Restaurant>()
-                .AddTransient<Manager>()
-                .AddSingleton<IInMemoryRepository<IBookingRequest>, InMemoryRepository<IBookingRequest>>()
+                .AddSingleton<Manager>()
+                .AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>()
+                .AddSingleton<IKitchenMessageRepository<KitchenTableBookedModel>, KitchenMessageRepository>()
+                .AddSingleton<IConnection, Connection>()
+                .AddSingleton<Notifier>()
+                .AddSingleton<IInMemoryRepository<NotifyModel>, InMemoryRepository<NotifyModel>>()
                 .BuildServiceProvider(validateScopes: true);
 
             _harness = _provider.GetRequiredService<InMemoryTestHarness>();
@@ -76,7 +91,7 @@ namespace Restaurant.Tests
 
             var saga = sagaHarness.Created.Contains(orderId);
 
-            Assert.That(actual: saga, Is.Not.Null);
+            Assert.That(actual: saga, Is.Not.Null); 
             Assert.That(actual: saga.ClientId, Is.EqualTo(clientId));
             Assert.That(await _harness.Published.Any<ITableBooked>());
             Assert.That(await _harness.Published.Any<IKitchenReady>());
