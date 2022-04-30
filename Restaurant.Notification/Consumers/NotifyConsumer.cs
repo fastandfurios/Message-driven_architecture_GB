@@ -1,20 +1,24 @@
-﻿using MassTransit;
+﻿
+
+#nullable disable
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using Restaurant.Messages.Interfaces;
 using Restaurant.Messages.Repositories.Interfaces;
 using Restaurant.Notification.Models;
-
-#nullable disable
 namespace Restaurant.Notification.Consumers
 {
     public class NotifyConsumer : IConsumer<INotify>
     {
         private readonly Notifier _notifier;
         private readonly IInMemoryRepository<NotifyModel> _repository;
+        private readonly ILogger<NotifyConsumer> _logger;
 
-        public NotifyConsumer(Notifier notifier, IInMemoryRepository<NotifyModel> repository)
+        public NotifyConsumer(Notifier notifier, IInMemoryRepository<NotifyModel> repository, ILogger<NotifyConsumer> logger)
         {
             _notifier = notifier;
             _repository = repository;
+            _logger = logger;
         }
 
         public Task Consume(ConsumeContext<INotify> context)
@@ -23,8 +27,8 @@ namespace Restaurant.Notification.Consumers
 
             if (model is not null && model.CheckMessageId(context.MessageId.ToString()))
             {
-                Console.WriteLine(context.Message.ToString());
-                Console.WriteLine("Second time");
+                _logger.Log(LogLevel.Information, context.Message.ToString());
+                _logger.Log(LogLevel.Information, "Second time");
                 return context.ConsumeCompleted;
             }
 
@@ -32,9 +36,9 @@ namespace Restaurant.Notification.Consumers
                 context.Message.ClientId,
                 context.Message.Message,
                 context.MessageId.ToString());
-
-            Console.WriteLine(context.MessageId.ToString());
-            Console.WriteLine("First time");
+            
+            _logger.Log(LogLevel.Information, context.MessageId.ToString());
+            _logger.Log(LogLevel.Information, "First time");
             var resultModel = model?.Update(requestModel, context.Message.ToString()!) ?? requestModel;
 
             _repository.AddOrUpdate(resultModel);

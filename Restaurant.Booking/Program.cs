@@ -1,8 +1,11 @@
 ﻿#region references
 using System.Text;
+using MassTransit.Audit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Prometheus;
 using Restaurant.Booking;
+using Restaurant.Booking.Audit;
 using Restaurant.Booking.Extensions;
 using Restaurant.Booking.Models;
 using Restaurant.Booking.Saga;
@@ -10,26 +13,36 @@ using Restaurant.Messages.Repositories.Implementation;
 using Restaurant.Messages.Repositories.Interfaces;
 #endregion
 
-#region main
 Console.OutputEncoding = Encoding.UTF8;
-CreateHostBuilder(args).Build().Run();
+
+#region services
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton<IMessageAuditStore, AuditStore>();
+
+builder.Services.AddAndConfigMassTransit();
+
+builder.Services.AddTransient<RestaurantBooking>();
+
+builder.Services.AddTransient<RestaurantBookingSaga>();
+
+builder.Services.AddTransient<Restaurant.Booking.Restaurant>();
+
+builder.Services.AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>();
+
+builder.Services.AddHostedService<Worker>();
 #endregion
 
-#region methods
-static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
-        .ConfigureServices(services =>
-        {
-            services.AddAndConfigMassTransit();
+#region pipeline
+var app = builder.Build();
 
-            services.AddTransient<RestaurantBooking>();
+app.UseRouting();
 
-            services.AddTransient<RestaurantBookingSaga>();
+app.MapMetrics();
 
-            services.AddTransient<Restaurant.Booking.Restaurant>();
+app.MapControllers();
 
-            services.AddSingleton<IInMemoryRepository<BookingRequestModel>, InMemoryRepository<BookingRequestModel>>();
-
-            services.AddHostedService<Worker>();
-        });
+app.Run();
 #endregion
