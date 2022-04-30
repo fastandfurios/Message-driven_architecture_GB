@@ -1,4 +1,4 @@
-﻿namespace Restaurant.Booking.Consumers
+﻿namespace Restaurant.Booking.Consumers.Expires.Interfaces
 {
     public interface IBookingExpire
     {

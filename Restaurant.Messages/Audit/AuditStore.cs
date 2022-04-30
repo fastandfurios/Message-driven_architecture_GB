@@ -2,7 +2,7 @@
 using MassTransit.Audit;
 using Microsoft.Extensions.Logging;
 
-namespace Restaurant.Kitchen.Audit
+namespace Restaurant.Messages.Audit
 {
     public class AuditStore : IMessageAuditStore
     {

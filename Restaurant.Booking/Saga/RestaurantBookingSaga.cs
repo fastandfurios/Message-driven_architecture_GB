@@ -1,9 +1,10 @@
-﻿using MassTransit;
-using Restaurant.Booking.Consumers;
+﻿#nullable disable
+using MassTransit;
+using Restaurant.Booking.Consumers.Expires.Implementation;
+using Restaurant.Booking.Consumers.Expires.Interfaces;
 using Restaurant.Messages.Implementation;
 using Restaurant.Messages.Interfaces;
 
-#nullable disable
 namespace Restaurant.Booking.Saga
 {
     public class RestaurantBookingSaga : MassTransitStateMachine<RestaurantBooking>

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Prometheus;
 using Restaurant.Kitchen;
-using Restaurant.Kitchen.Audit;
+using Restaurant.Messages.Audit;
 using Restaurant.Kitchen.DAL.Models;
 using Restaurant.Kitchen.DAL.Repositories.Implementation;
 using Restaurant.Kitchen.DAL.Repositories.Interfaces;

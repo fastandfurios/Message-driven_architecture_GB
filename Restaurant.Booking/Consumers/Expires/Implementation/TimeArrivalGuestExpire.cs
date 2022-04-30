@@ -1,6 +1,7 @@
-﻿using Restaurant.Booking.Saga;
+﻿using Restaurant.Booking.Consumers.Expires.Interfaces;
+using Restaurant.Booking.Saga;
 
-namespace Restaurant.Booking.Consumers
+namespace Restaurant.Booking.Consumers.Expires.Implementation
 {
     public class TimeArrivalGuestExpire : ITimeArrivalGuestExpire
     {

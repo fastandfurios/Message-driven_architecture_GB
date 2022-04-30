@@ -4,12 +4,11 @@ using MassTransit.Audit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Prometheus;
 using Restaurant.Messages.Repositories.Implementation;
 using Restaurant.Messages.Repositories.Interfaces;
 using Restaurant.Notification;
-using Restaurant.Notification.Audit;
+using Restaurant.Messages.Audit;
 using Restaurant.Notification.Extensions;
 using Restaurant.Notification.Models;
 #endregion

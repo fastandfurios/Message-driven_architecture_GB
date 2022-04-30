@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Prometheus;
 using Restaurant.Booking;
-using Restaurant.Booking.Audit;
+using Restaurant.Messages.Audit;
 using Restaurant.Booking.Extensions;
 using Restaurant.Booking.Models;
 using Restaurant.Booking.Saga;
