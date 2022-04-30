@@ -9,8 +9,13 @@ namespace Restaurant.Kitchen
             switch (dish.Id)
             {
                 case (int)Dishes.Pizza:
+                    dish.Name = Dishes.Pizza.ToString();
+                    return (true, dish);
                 case (int)Dishes.Burger:
+                    dish.Name = Dishes.Burger.ToString();
+                    return (true, dish);
                 case (int)Dishes.Rolls:
+                    dish.Name = Dishes.Rolls.ToString();
                     return (true, dish);
                 case (int)Dishes.Chicken:
                     dish.Name = Dishes.Chicken.ToString();
